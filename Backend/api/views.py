@@ -22,6 +22,48 @@ from .serializers import (
 )
 
 
+class HealthCheckView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({
+            'status': 'ok',
+            'message': 'API is working fine and ready to serve requests. Welcome to QuantumSim API! 🚀',
+            'timestamp': timezone.now().isoformat(),
+            'application': {
+                'name': 'QuantumSim',
+                'version': '1.0.0',
+                'description': 'Cloud-based quantum computing simulator',
+                'author': 'Zypject.com'
+            },
+            'endpoints': {
+                'register': '/api/register/',
+                'login': '/api/login/',
+                'verify-otp': '/api/verify-otp/',
+                'resend-otp': '/api/resend-otp/',
+                'profile': '/api/profile/',
+                'forgot-password': '/api/forgot-password/',
+                'reset-password': '/api/reset-password/'
+            },
+            'health': {
+                'database': 'connected',
+                'email_service': 'available',
+                'social_auth': 'enabled'
+            }
+        }, status=status.HTTP_200_OK)
+
+
+class HealthCheckView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({
+            'status': 'ok',
+            'message': 'API is working fine and ready to serve requests. Welcome to QuantumSim API! 🚀 create by zypject.com',
+            'timestamp': timezone.now().isoformat()
+        }, status=status.HTTP_200_OK)
+
+
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 

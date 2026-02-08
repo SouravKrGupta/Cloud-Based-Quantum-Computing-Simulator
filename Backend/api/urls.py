@@ -8,11 +8,13 @@ from .views import (
     ResendOTPView,
     UserProfileView,
     ForgotPasswordView,
-    ResetPasswordView
+    ResetPasswordView,
+    HealthCheckView
 )
 from .google_views import google_success_view
 
 urlpatterns = [
+    path('', HealthCheckView.as_view(), name='health-check'),
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
