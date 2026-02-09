@@ -3,10 +3,8 @@ from django.shortcuts import redirect
 from social_core.pipeline.user import get_username as social_get_username
 from social_core.pipeline.user import create_user as social_create_user
 from social_core.pipeline.social_auth import associate_user
-from social_core.pipeline.user import update_user_details
+from social_core.pipeline.user import user_details
 from social_core.pipeline.social_auth import load_extra_data
-from social_core.pipeline.mail import send_validation
-from social_core.pipeline.validation import validate_email
 from .models import CustomUser
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -46,8 +44,8 @@ def redirect_after_auth(strategy, details, user=None, *args, **kwargs):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         
-        # Redirect to a page with tokens
-        return redirect(f'/api/google/success/?access={access_token}&refresh={refresh_token}&user_id={user.id}')
+        # Redirect to frontend home page with tokens
+        return redirect(f'http://localhost:5173/?access={access_token}&refresh={refresh_token}&user_id={user.id}')
 
 
 def complete_google_auth(strategy, details, user=None, *args, **kwargs):

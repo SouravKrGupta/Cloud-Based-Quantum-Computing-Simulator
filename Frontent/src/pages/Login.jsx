@@ -214,7 +214,7 @@ const Login = () => {
           </div>
           
           <a
-            href="http://localhost:8000/api/google/login/"
+            href="http://localhost:8000/api/login/google-oauth2/"
             className="group relative w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all mt-4"
           >
             <span className="flex items-center">

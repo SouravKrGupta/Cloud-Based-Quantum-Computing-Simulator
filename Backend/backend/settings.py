@@ -93,7 +93,7 @@ AUTH_USER_MODEL = 'api.CustomUser'
 
 # Social Authentication (Google OAuth)
 AUTHENTICATION_BACKENDS = [
-    'api.backends.CustomGoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -104,7 +104,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'email',
     'profile',
 ]
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/api/google/callback/'
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/api/complete/google-oauth2/'
 
 # JWT Settings
 from datetime import timedelta
