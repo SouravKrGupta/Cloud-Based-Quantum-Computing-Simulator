@@ -107,25 +107,25 @@ const ResetPassword = () => {
         
         {/* Reset Password Form */}
         <div className="card-glass p-8">
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
+          <h3 className="text-2xl font-bold text-white text-center mb-6">
             Create New Password
           </h3>
           
           {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
+            <div className="form-success">
               {successMessage}
             </div>
           )}
           
           {errors.general && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+            <div className="form-error-msg">
               {errors.general}
             </div>
           )}
           
-          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
                 New Password
               </label>
               <input
@@ -134,16 +134,16 @@ const ResetPassword = () => {
                 type="password"
                 autoComplete="new-password"
                 required
-                className={`appearance-none relative block w-full px-4 py-3 border ${errors.password ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
+                className={`input-field-dark ${errors.password ? 'input-error' : ''}`}
                 placeholder="Enter new password"
                 value={formData.password}
                 onChange={handleChange}
               />
-              {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
+              {errors.password && <div className="form-error">{errors.password}</div>}
             </div>
             
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">
                 Confirm New Password
               </label>
               <input
@@ -152,35 +152,33 @@ const ResetPassword = () => {
                 type="password"
                 autoComplete="new-password"
                 required
-                className={`appearance-none relative block w-full px-4 py-3 border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
+                className={`input-field-dark ${errors.confirmPassword ? 'input-error' : ''}`}
                 placeholder="Confirm new password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
-              {errors.confirmPassword && <div className="text-red-500 text-xs mt-1">{errors.confirmPassword}</div>}
+              {errors.confirmPassword && <div className="form-error">{errors.confirmPassword}</div>}
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white ${isLoading ? 'bg-gray-400' : 'bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all shadow-lg`}
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Resetting Password...
-                  </div>
-                ) : (
-                  'Reset Password'
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary w-full"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <span>Resetting Password...</span>
+                </div>
+              ) : (
+                'Reset Password'
+              )}
+            </button>
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              <Link to="/login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
+            <p className="text-sm text-gray-400">
+              <Link to="/login" className="font-medium text-purple-300 hover:text-purple-200 transition-colors">
                 Back to login
               </Link>
             </p>
@@ -200,16 +198,7 @@ const ResetPassword = () => {
             transform: translate(-20px, 20px) scale(0.9);
           }
         }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
+      </div>
     </div>
   );
 };
