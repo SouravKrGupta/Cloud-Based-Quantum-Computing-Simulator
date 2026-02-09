@@ -67,18 +67,18 @@ const ResendOTP = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-1/4 right-1/3 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-1/4 right-1/3 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
       <div className="relative z-10 max-w-md w-full space-y-8">
         {/* Quantum Themed Header */}
         <div className="text-center">
-          <div className="mx-auto h-20 w-20 mb-4 flex items-center justify-center rounded-full bg-linear-to-r from-purple-400 to-blue-500 shadow-lg animate-pulse">
+          <div className="mx-auto h-20 w-20 mb-4 flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-blue-600 shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all animate-pulse-slow">
             <svg className="h-12 w-12 text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="45" stroke="white" strokeWidth="2" fill="none" opacity="0.3"/>
               <path d="M25 50 Q50 25 75 50 Q50 75 25 50" fill="white" opacity="0.5"/>
@@ -90,11 +90,11 @@ const ResendOTP = () => {
           <h2 className="text-4xl font-extrabold text-white mb-2">
             QuantumSim
           </h2>
-          <p className="text-purple-200">Cloud-based quantum computing simulator</p>
+          <p className="text-purple-300">Cloud-based quantum computing simulator</p>
         </div>
         
         {/* Resend OTP Form */}
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden p-8">
+        <div className="card-glass p-8">
           <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
             Resend OTP
           </h3>

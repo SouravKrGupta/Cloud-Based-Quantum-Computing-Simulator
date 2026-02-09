@@ -142,22 +142,22 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen gradient-bg py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-3">Profile</h1>
-          <p className="text-purple-200">Manage your account settings</p>
+          <h1 className="section-header text-4xl md:text-5xl font-bold mb-3">Profile</h1>
+          <p className="text-purple-300">Manage your account settings</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="card-glass p-8">
           {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
+            <div className="form-success">
               {successMessage}
             </div>
           )}
 
           {errors.general && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="form-error-msg">
               {errors.general}
             </div>
           )}
@@ -165,48 +165,48 @@ const Profile = () => {
           {!isEditing ? (
             <div className="space-y-6">
               <div className="flex flex-wrap justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Personal Information</h2>
+                <h2 className="text-2xl font-bold text-white">Personal Information</h2>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
                 >
                   Edit Profile
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
-                  <p className="text-lg text-gray-800">{userData.name}</p>
+                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+                  <label className="block text-sm font-medium text-purple-300 mb-2">Full Name</label>
+                  <p className="text-lg text-white font-semibold">{userData.name}</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Email Address</label>
-                  <p className="text-lg text-gray-800">{userData.email}</p>
+                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+                  <label className="block text-sm font-medium text-purple-300 mb-2">Email Address</label>
+                  <p className="text-lg text-white font-semibold">{userData.email}</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
-                  <p className="text-lg text-gray-800">
-                    {userData.phone_number || 'Not provided'}
+                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+                  <label className="block text-sm font-medium text-purple-300 mb-2">Phone Number</label>
+                  <p className="text-lg text-white font-semibold">
+                    {userData.phone_number || <span className="text-gray-400">Not provided</span>}
                   </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Address</label>
-                  <p className="text-lg text-gray-800">
-                    {userData.address || 'Not provided'}
+                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+                  <label className="block text-sm font-medium text-purple-300 mb-2">Address</label>
+                  <p className="text-lg text-white font-semibold">
+                    {userData.address || <span className="text-gray-400">Not provided</span>}
                   </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Member Since</label>
-                  <p className="text-lg text-gray-800">
+                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+                  <label className="block text-sm font-medium text-purple-300 mb-2">Member Since</label>
+                  <p className="text-lg text-white font-semibold">
                     {new Date(userData.date_joined).toLocaleDateString()}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="mt-8 pt-6 border-t border-white/20">
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all shadow-lg"
                 >
                   Logout
                 </button>
@@ -215,7 +215,7 @@ const Profile = () => {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-wrap justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Edit Profile</h2>
+                <h2 className="text-2xl font-bold text-white">Edit Profile</h2>
                 <button
                   type="button"
                   onClick={() => {
@@ -226,14 +226,14 @@ const Profile = () => {
                       address: userData.address || '',
                     });
                   }}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors mr-2"
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors mr-2"
                 >
                   Cancel
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white mb-2">
                   Full Name
                 </label>
                 <input
@@ -241,17 +241,15 @@ const Profile = () => {
                   name="name"
                   value={editData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`input-field-dark ${errors.name ? 'input-error' : ''}`}
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  <p className="form-error">{errors.name}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white mb-2">
                   Phone Number
                 </label>
                 <input
@@ -260,17 +258,15 @@ const Profile = () => {
                   value={editData.phone_number}
                   onChange={handleChange}
                   placeholder="1234567890"
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.phone_number ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`input-field-dark ${errors.phone_number ? 'input-error' : ''}`}
                 />
                 {errors.phone_number && (
-                  <p className="text-red-500 text-sm mt-1">{errors.phone_number}</p>
+                  <p className="form-error">{errors.phone_number}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white mb-2">
                   Address
                 </label>
                 <textarea
@@ -279,22 +275,18 @@ const Profile = () => {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Enter your address"
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.address ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`input-field-dark ${errors.address ? 'input-error' : ''}`}
                 />
                 {errors.address && (
-                  <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+                  <p className="form-error">{errors.address}</p>
                 )}
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/20">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`btn-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isLoading ? 'Updating...' : 'Update Profile'}
                 </button>

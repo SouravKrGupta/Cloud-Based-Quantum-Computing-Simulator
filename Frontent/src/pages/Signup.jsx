@@ -98,18 +98,18 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-900 via-blue-900 to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-1/4 right-1/3 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-1/4 right-1/3 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 max-w-md w-full space-y-8">
+      <div className="relative z-10 max-w-2xl w-full space-y-8">
         {/* Quantum Themed Header */}
         <div className="text-center">
-          <div className="mx-auto h-20 w-20 mb-4 flex items-center justify-center rounded-full bg-linear-to-r from-purple-400 to-blue-500 shadow-lg animate-pulse">
+          <div className="mx-auto h-20 w-20 mb-4 flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-blue-600 shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 transition-all animate-pulse-slow">
             <svg className="h-12 w-12 text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="45" stroke="white" strokeWidth="2" fill="none" opacity="0.3"/>
               <path d="M25 50 Q50 25 75 50 Q50 75 25 50" fill="white" opacity="0.5"/>
@@ -121,31 +121,31 @@ const Signup = () => {
           <h2 className="text-4xl font-extrabold text-white mb-2">
             QuantumSim
           </h2>
-          <p className="text-purple-200">Cloud-based quantum computing simulator</p>
+          <p className="text-purple-300">Join the quantum computing revolution</p>
         </div>
         
         {/* Signup Form */}
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden p-8">
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            Create an Account
+        <div className="card-glass p-8">
+          <h3 className="text-2xl font-bold text-white text-center mb-6">
+            Create Your Account
           </h3>
           
           {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
+            <div className="form-success">
               {successMessage}
             </div>
           )}
           
           {errors.general && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+            <div className="form-error-msg">
               {errors.general}
             </div>
           )}
           
-          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
                   Full Name
                 </label>
                 <input
@@ -154,16 +154,16 @@ const Signup = () => {
                   type="text"
                   autoComplete="name"
                   required
-                  className={`appearance-none relative block w-full px-4 py-3 border ${errors.name ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
-                  placeholder="Enter your full name"
+                  className={`input-field-dark ${errors.name ? 'input-error' : ''}`}
+                  placeholder="Enter your name"
                   value={formData.name}
                   onChange={handleChange}
                 />
-                {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name}</div>}
+                {errors.name && <div className="form-error">{errors.name}</div>}
               </div>
               
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                   Email Address
                 </label>
                 <input
@@ -172,18 +172,18 @@ const Signup = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className={`appearance-none relative block w-full px-4 py-3 border ${errors.email ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
+                  className={`input-field-dark ${errors.email ? 'input-error' : ''}`}
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
                 />
-                {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
+                {errors.email && <div className="form-error">{errors.email}</div>}
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
                   Password
                 </label>
                 <input
@@ -192,16 +192,16 @@ const Signup = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  className={`appearance-none relative block w-full px-4 py-3 border ${errors.password ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
-                  placeholder="Enter your password"
+                  className={`input-field-dark ${errors.password ? 'input-error' : ''}`}
+                  placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
                 />
-                {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
+                {errors.password && <div className="form-error">{errors.password}</div>}
               </div>
               
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -210,122 +210,95 @@ const Signup = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  className={`appearance-none relative block w-full px-4 py-3 border ${errors.confirmPassword ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
-                  placeholder="Confirm your password"
+                  className={`input-field-dark ${errors.confirmPassword ? 'input-error' : ''}`}
+                  placeholder="Confirm password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                 />
-                {errors.confirmPassword && <div className="text-red-500 text-xs mt-1">{errors.confirmPassword}</div>}
+                {errors.confirmPassword && <div className="form-error">{errors.confirmPassword}</div>}
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number (Optional)
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-white mb-2">
+                  Phone Number <span className="text-gray-400">(Optional)</span>
                 </label>
                 <input
                   id="phoneNumber"
                   name="phoneNumber"
                   type="tel"
                   autoComplete="tel"
-                  className={`appearance-none relative block w-full px-4 py-3 border ${errors.phoneNumber ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
-                  placeholder="Enter your phone number"
+                  className={`input-field-dark ${errors.phoneNumber ? 'input-error' : ''}`}
+                  placeholder="Enter phone number"
                   value={formData.phoneNumber}
                   onChange={handleChange}
                 />
-                {errors.phoneNumber && <div className="text-red-500 text-xs mt-1">{errors.phoneNumber}</div>}
+                {errors.phoneNumber && <div className="form-error">{errors.phoneNumber}</div>}
               </div>
               
-              <div className="md:col-span-2">
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address (Optional)
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-white mb-2">
+                  Address <span className="text-gray-400">(Optional)</span>
                 </label>
-                <textarea
+                <input
                   id="address"
                   name="address"
-                  rows="3"
-                  className={`appearance-none relative block w-full px-4 py-3 border ${errors.address ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all`}
+                  type="text"
+                  className={`input-field-dark ${errors.address ? 'input-error' : ''}`}
                   placeholder="Enter your address"
                   value={formData.address}
                   onChange={handleChange}
                 />
-                {errors.address && <div className="text-red-500 text-xs mt-1">{errors.address}</div>}
+                {errors.address && <div className="form-error">{errors.address}</div>}
               </div>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white ${isLoading ? 'bg-gray-400' : 'bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all shadow-lg`}
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Signing Up...
-                  </div>
-                ) : (
-                  'Sign Up'
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary w-full mt-6"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <span>Creating Account...</span>
+                </div>
+              ) : (
+                'Sign Up'
+              )}
+            </button>
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-400">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
+              <Link to="/login" className="font-medium text-purple-300 hover:text-purple-200 transition-colors">
                 Login here
               </Link>
             </p>
           </div>
           
-          <div className="flex items-center mt-6">
-            <div className="grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-500">or</span>
-            <div className="grow border-t border-gray-300"></div>
+          <div className="flex items-center mt-6 space-x-3">
+            <div className="flex-1 border-t border-white/20"></div>
+            <span className="text-xs text-gray-400">or</span>
+            <div className="flex-1 border-t border-white/20"></div>
           </div>
           
           <a
             href="http://localhost:8000/api/login/google-oauth2/"
-            className="group relative w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all mt-4"
+            className="group relative w-full flex justify-center items-center py-3 px-4 border border-white/20 text-sm font-medium rounded-lg text-white hover:bg-white/10 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all mt-4"
           >
-            <span className="flex items-center">
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="none">
-                <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
-                <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z" fill="#34A853"/>
-                <path d="M4.405 11.9c-.2-.6-.314-1.24-.314-1.9 0-.66.114-1.3.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49l3.34-2.59z" fill="#FBBC05"/>
-                <path d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.51l3.34 2.59C5.19 5.736 7.395 3.977 10 3.977z" fill="#EA4335"/>
-              </svg>
-              Continue with Google
-            </span>
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="none">
+              <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
+              <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z" fill="#34A853"/>
+              <path d="M4.405 11.9c-.2-.6-.314-1.24-.314-1.9 0-.66.114-1.3.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49l3.34-2.59z" fill="#FBBC05"/>
+              <path d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.51l3.34 2.59C5.19 5.736 7.395 3.977 10 3.977z" fill="#EA4335"/>
+            </svg>
+            <span>Continue with Google</span>
           </a>
         </div>
       </div>
-
-      <style>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 };

@@ -1,1 +1,4 @@
-/* Tailwind CSS will handle all styling */
+/* Custom Tailwind CSS configurations and utilities */
+
+/* Import Tailwind CSS */
+@import "tailwindcss";
