@@ -10,7 +10,11 @@ import Login from './pages/Login';
 import VerifyOTP from './pages/VerifyOTP';
 import ResendOTP from './pages/ResendOTP';
 import Home from './pages/Home';
-
+import QuantumComposer from './pages/QuantumComposer';
+import About from './pages/About';
+import Documentation from './pages/Documentation';
+import Blog from './pages/Blog';
+import Contact from './pages/Contact';
 function App() {
   return (
     <Router>
@@ -20,6 +24,11 @@ function App() {
         <main className="grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/quantum-composer" element={<QuantumComposer />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/documentation" element={<Documentation />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />

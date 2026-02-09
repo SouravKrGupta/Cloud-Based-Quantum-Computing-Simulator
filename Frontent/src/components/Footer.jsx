@@ -40,16 +40,16 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="#about" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
+                <Link to="/about" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
                   <span className="text-purple-400">›</span>
                   <span>About</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#contact" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
+                <Link to="/contact" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
                   <span className="text-purple-400">›</span>
                   <span>Contact</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -62,22 +62,22 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#docs" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
+                <Link to="/documentation" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
                   <span className="text-purple-400">›</span>
                   <span>Documentation</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#tutorials" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
-                  <span className="text-purple-400">›</span>
-                  <span>Tutorials</span>
-                </a>
-              </li>
-              <li>
-                <a href="#blog" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
+                <Link to="/blog" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
                   <span className="text-purple-400">›</span>
                   <span>Blog</span>
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link to="/quantum-composer" className="text-gray-400 hover:text-purple-400 transition-colors duration-200 flex items-center space-x-2">
+                  <span className="text-purple-400">›</span>
+                  <span>Quantum Composer</span>
+                </Link>
               </li>
             </ul>
           </div>
