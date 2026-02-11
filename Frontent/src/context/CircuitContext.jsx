@@ -119,19 +119,47 @@ export const CircuitProvider = ({ children }) => {
     setCustomGates((prev) => prev.filter((g) => g.id !== gateId));
   }, []);
 
-  // Save circuit to local storage
-  const saveCircuit = useCallback(() => {
-    const data = {
-      name: circuitName,
-      qubits,
-      classicalBits,
-      gates: circuit,
-      customGates,
-    };
-    localStorage.setItem(`circuit_${circuitName}`, JSON.stringify(data));
+  // Save circuit to backend
+  const saveCircuit = useCallback(async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Please login to save circuits to backend');
+      return false;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/api/circuits/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: circuitName,
+          qubits,
+          classicalBits,
+          gates: circuit,
+          customGates,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Circuit saved to backend:', data);
+        return true;
+      } else {
+        console.error('Error saving circuit:', response.status);
+        alert('Failed to save circuit');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving circuit:', error);
+      alert('Failed to save circuit');
+      return false;
+    }
   }, [circuit, circuitName, qubits, classicalBits, customGates]);
 
-  // Load circuit from local storage
+  // Load circuit from local storage (fallback)
   const loadCircuit = useCallback((name) => {
     const data = localStorage.getItem(`circuit_${name}`);
     if (data) {
@@ -146,13 +174,43 @@ export const CircuitProvider = ({ children }) => {
     return false;
   }, []);
 
-  // Get all saved circuits
-  const getSavedCircuits = useCallback(() => {
-    const keys = Object.keys(localStorage);
-    return keys
-      .filter((k) => k.startsWith('circuit_'))
-      .map((k) => localStorage.getItem(k))
-      .map((v) => JSON.parse(v));
+  // Get all saved circuits (from backend)
+  const getSavedCircuits = useCallback(async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      // Fallback to localStorage if not logged in
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('circuit_'));
+      return keys.map(key => {
+        const data = JSON.parse(localStorage.getItem(key));
+        return {
+          id: key.replace('circuit_', ''),
+          name: data.name,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          qubits: data.qubits,
+        };
+      });
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/api/circuits/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.data;
+      } else {
+        console.error('Error fetching circuits:', response.status);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching circuits:', error);
+      return [];
+    }
   }, []);
 
   const value = {

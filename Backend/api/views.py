@@ -472,7 +472,7 @@ class QuantumCircuitSimulationView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """Simulate a quantum circuit"""
+        """Simulate a quantum circuit using Qiskit"""
         start_time = time.time()
         
         circuit_data = request.data
@@ -482,14 +482,79 @@ class QuantumCircuitSimulationView(APIView):
             qubits = circuit_data.get('qubits', 5)
             gates = circuit_data.get('gates', [])
             
-            # Simulate quantum circuit (placeholder for actual quantum simulation)
-            # In a real implementation, this would use a quantum computing library like Qiskit or Cirq
-            state_vector = [0.5 for _ in range(2 ** qubits)]
-            probability_distribution = {
-                format(i, f'0{qubits}b'): 1 / (2 ** qubits)
-                for i in range(2 ** qubits)
-            }
-            measurements = [100 for _ in range(2 ** qubits)]
+            # Import Qiskit modules
+            from qiskit import QuantumCircuit as QiskitCircuit
+            from qiskit.quantum_info import Statevector
+            from qiskit_aer import AerSimulator
+            import numpy as np
+            
+            # Create Qiskit quantum circuit
+            qc = QiskitCircuit(qubits)
+            
+            # Add gates to the circuit
+            for gate in gates:
+                qubit_index = gate.get('qubitIndex', 0)
+                gate_type = gate.get('gate', '')
+                params = gate.get('params', {})
+                
+                if gate_type == 'H':
+                    qc.h(qubit_index)
+                elif gate_type == 'X':
+                    qc.x(qubit_index)
+                elif gate_type == 'Y':
+                    qc.y(qubit_index)
+                elif gate_type == 'Z':
+                    qc.z(qubit_index)
+                elif gate_type == 'S':
+                    qc.s(qubit_index)
+                elif gate_type == 'T':
+                    qc.t(qubit_index)
+                elif gate_type == 'RX':
+                    angle = params.get('angle', 0)
+                    qc.rx(angle, qubit_index)
+                elif gate_type == 'RY':
+                    angle = params.get('angle', 0)
+                    qc.ry(angle, qubit_index)
+                elif gate_type == 'RZ':
+                    angle = params.get('angle', 0)
+                    qc.rz(angle, qubit_index)
+                elif gate_type == 'CNOT':
+                    control = params.get('control', 0)
+                    qc.cx(control, qubit_index)
+                elif gate_type == 'Measure':
+                    classical_bit = params.get('classicalBit', 0)
+                    qc.measure(qubit_index, classical_bit)
+            
+            # Simulate the circuit to get state vector (without measurements)
+            # Remove measurements for state vector simulation
+            qc_no_measure = qc.copy()
+            for instruction in qc_no_measure.data:
+                if instruction.operation.name == 'measure':
+                    qc_no_measure.data.remove(instruction)
+            
+            state_vector = Statevector.from_instruction(qc_no_measure).data
+            state_vector = [complex(x).real for x in state_vector]
+            
+            # Simulate measurements if there are any measure operations
+            probability_distribution = {}
+            measurements = []
+            if any(instruction.operation.name == 'measure' for instruction in qc.data):
+                simulator = AerSimulator()
+                shots = 1000
+                result = simulator.run(qc, shots=shots).result()
+                counts = result.get_counts()
+                
+                for state in range(2 ** qubits):
+                    state_str = format(state, f'0{qubits}b')
+                    probability_distribution[state_str] = counts.get(state_str, 0) / shots
+                    measurements.append(counts.get(state_str, 0))
+            else:
+                # If no measurements, use state vector probabilities
+                for state in range(2 ** qubits):
+                    state_str = format(state, f'0{qubits}b')
+                    probability = abs(state_vector[state]) ** 2
+                    probability_distribution[state_str] = probability
+                    measurements.append(int(probability * 1000))
             
             execution_time = time.time() - start_time
             

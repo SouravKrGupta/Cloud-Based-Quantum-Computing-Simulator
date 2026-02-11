@@ -167,37 +167,37 @@ const GatePalette = () => {
                 {categoryLabels[categoryKey]}
               </button>
 
-              {/* Gates Display */}
-              {expandedCategories[categoryKey] && (
-                <div className={viewMode === 'list' 
-                  ? 'space-y-1 pl-4' 
-                  : 'grid grid-cols-4 gap-2 pl-0'}>
-                  {filtered.map((gate) => (
-                    <div
-                      key={gate.name}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, gate)}
-                      className={`cursor-move transition hover:opacity-90 ${
-                        viewMode === 'list'
-                          ? `p-2 border rounded ${gate.color} border-opacity-40 text-white text-xs flex flex-col`
-                          : `p-3 rounded ${gate.color} text-white flex flex-col items-center justify-center aspect-square text-center hover:shadow-lg`
-                      }`}
-                      title={gate.fullName}
-                    >
-                      {viewMode === 'list' ? (
-                        <>
-                          <div className="font-bold text-sm">{gate.name}</div>
-                          <div className="text-xs opacity-80 leading-tight">{gate.fullName}</div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="text-lg font-bold leading-tight">{gate.name}</div>
-                          <div className="text-xs opacity-90 leading-tight">{gate.fullName}</div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
+               {/* Gates Display */}
+               {expandedCategories[categoryKey] && (
+                 <div className={viewMode === 'list' 
+                   ? 'space-y-1 pl-4' 
+                   : 'grid grid-cols-5 gap-1 pl-0'}>
+                   {filtered.map((gate) => (
+                     <div
+                       key={gate.name}
+                       draggable
+                       onDragStart={(e) => handleDragStart(e, gate)}
+                       className={`cursor-move transition hover:opacity-90 ${
+                         viewMode === 'list'
+                           ? `p-1.5 border rounded ${gate.color} border-opacity-40 text-white text-xs flex flex-col`
+                           : `p-1.5 rounded ${gate.color} text-white flex flex-col items-center justify-center aspect-square text-center hover:shadow-lg`
+                       }`}
+                       title={gate.fullName}
+                     >
+                       {viewMode === 'list' ? (
+                         <>
+                           <div className="font-bold text-xs">{gate.name}</div>
+                           <div className="text-xs opacity-80 leading-tight">{gate.fullName}</div>
+                         </>
+                       ) : (
+                         <>
+                           <div className="text-sm font-bold leading-tight">{gate.name}</div>
+                           <div className="text-xs opacity-90 leading-tight">{gate.fullName}</div>
+                         </>
+                       )}
+                     </div>
+                   ))}
+                 </div>
               )}
             </div>
           );

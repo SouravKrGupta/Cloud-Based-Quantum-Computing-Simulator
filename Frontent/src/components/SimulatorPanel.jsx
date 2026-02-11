@@ -161,14 +161,48 @@ const SimulatorPanel = () => {
 
           {visualizations.type === 'qsphere' && (
             <div className="text-center">
-              <div className="inline-block w-48 h-48 rounded-full border-4 border-blue-500 bg-gray-900 flex items-center justify-center">
-                <div className="text-gray-400 text-sm">
-                  Q-Sphere visualization with {qubits} qubit(s)
+              <div className="inline-block w-40 h-40 rounded-full border-4 border-blue-500 bg-gray-900 flex items-center justify-center relative overflow-hidden">
+                {/* Q-Sphere grid */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-32 h-32 border-2 border-blue-400 rounded-full opacity-30"></div>
+                  <div className="w-24 h-24 border-2 border-blue-400 rounded-full opacity-30"></div>
+                  <div className="w-16 h-16 border-2 border-blue-400 rounded-full opacity-30"></div>
+                </div>
+                {/* State vectors */}
+                {topStates.slice(0, 4).map((state, index) => {
+                  const angle = (index / 4) * Math.PI * 2;
+                  const radius = 0.3 + (index % 2) * 0.2;
+                  const x = Math.cos(angle) * radius * 60;
+                  const y = Math.sin(angle) * radius * 60;
+                  const size = Math.sqrt(state.probability) * 10 + 4;
+                  
+                  return (
+                    <div
+                      key={state.state}
+                      className="absolute bg-blue-500 rounded-full border-2 border-white shadow-lg"
+                      style={{
+                        left: `50%`,
+                        top: `50%`,
+                        width: `${size}px`,
+                        height: `${size}px`,
+                        transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                        opacity: state.probability > 0.05 ? 0.8 : 0.3,
+                      }}
+                      title={`|${state.state}⟩: ${state.percentage}%`}
+                    >
+                      <div className="flex items-center justify-center h-full text-xs font-bold text-white">
+                        {state.state}
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="text-gray-400 text-xs font-semibold">
+                  Q-Sphere ({qubits} qubits)
                 </div>
               </div>
-              <p className="text-gray-400 text-xs mt-4">
-                (3D Q-Sphere would render here)
-              </p>
+              <div className="text-gray-400 text-xs mt-2">
+                Top states: {topStates.filter(s => s.probability > 0.05).length}
+              </div>
             </div>
           )}
 

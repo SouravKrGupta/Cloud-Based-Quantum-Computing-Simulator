@@ -15,18 +15,18 @@ const ExecuteDialog = ({ onClose }) => {
     }
 
     setIsRunning(true);
-    const qasm = generateOpenQASM();
 
     try {
-      // Mock API call - replace with actual backend call
-      const response = await fetch('/api/execute/', {
+      // Call quantum circuit simulation API
+      const response = await fetch('http://localhost:8000/api/simulate/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
         },
         body: JSON.stringify({
-          qasm,
-          backend,
+          qubits,
+          gates: circuit,
           shots,
         }),
       });
@@ -34,11 +34,10 @@ const ExecuteDialog = ({ onClose }) => {
       if (response.ok) {
         const data = await response.json();
         setExecution({
-          jobId: data.job_id,
-          status: 'submitted',
-          result: data.result,
+          jobId: data.data.job_id,
+          status: 'completed',
+          result: data.data,
         });
-        alert(`Job submitted! ID: ${data.job_id}`);
         onClose();
       } else {
         alert('Error submitting job');
