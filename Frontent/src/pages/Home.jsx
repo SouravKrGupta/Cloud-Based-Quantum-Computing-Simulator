@@ -30,7 +30,7 @@ const Home = () => {
           
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
             <Link 
-              to="/quantum-composer" 
+              to="/circuit-composer" 
               className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
             >
               Launch Quantum Composer
@@ -154,7 +154,7 @@ const Home = () => {
           <p className="text-xl text-gray-300 mb-10">Join thousands of quantum computing enthusiasts and start exploring today</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link 
-              to="/quantum-composer" 
+              to="/circuit-composer" 
               className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
             >
               Launch Quantum Composer

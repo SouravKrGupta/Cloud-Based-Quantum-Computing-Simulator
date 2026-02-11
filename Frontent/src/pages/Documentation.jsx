@@ -355,7 +355,7 @@ const Documentation = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Practice What You've Learned?</h2>
           <p className="text-xl text-white/80 mb-10">Apply your knowledge in the Quantum Composer</p>
-          <a href="/quantum-composer" className="inline-block px-8 py-4 bg-white text-purple-600 font-semibold rounded-xl hover:bg-white/90 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-white/30">
+          <a href="/circuit-composer" className="inline-block px-8 py-4 bg-white text-purple-600 font-semibold rounded-xl hover:bg-white/90 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-white/30">
             Launch Quantum Composer
           </a>
         </div>
