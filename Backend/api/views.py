@@ -1,5 +1,7 @@
 import random
 import string
+import time
+import json
 from datetime import timedelta
 from django.utils import timezone
 from django.conf import settings
@@ -11,14 +13,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from social_django.utils import psa
-from .models import CustomUser, OTPVerification
+from .models import CustomUser, OTPVerification, QuantumCircuit, SimulationResult
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
     UserSerializer,
     OTPVerificationSerializer,
     ForgotPasswordSerializer,
-    ResetPasswordSerializer
+    ResetPasswordSerializer,
+    QuantumCircuitSerializer,
+    SimulationResultSerializer
 )
 
 
@@ -353,6 +357,294 @@ class ResetPasswordView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuantumCircuitView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Get all quantum circuits for the authenticated user"""
+        circuits = QuantumCircuit.objects.filter(user=request.user).order_by('-updated_at')
+        serializer = QuantumCircuitSerializer(circuits, many=True)
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """Create a new quantum circuit"""
+        serializer = QuantumCircuitSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuantumCircuitDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, circuit_id):
+        """Get a specific quantum circuit"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id)
+            
+            # Check if user has access to this circuit
+            if circuit.user != request.user and not circuit.is_public and request.user not in circuit.shared_with.all():
+                return Response({
+                    'success': False,
+                    'message': 'You do not have access to this circuit'
+                }, status=status.HTTP_403_FORBIDDEN)
+                
+            serializer = QuantumCircuitSerializer(circuit)
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, circuit_id):
+        """Update a quantum circuit"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id)
+            
+            # Check if user owns this circuit
+            if circuit.user != request.user:
+                return Response({
+                    'success': False,
+                    'message': 'You do not own this circuit'
+                }, status=status.HTTP_403_FORBIDDEN)
+                
+            serializer = QuantumCircuitSerializer(circuit, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'success': True,
+                    'data': serializer.data
+                }, status=status.HTTP_200_OK)
+            return Response({
+                'success': False,
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, circuit_id):
+        """Delete a quantum circuit"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id)
+            
+            # Check if user owns this circuit
+            if circuit.user != request.user:
+                return Response({
+                    'success': False,
+                    'message': 'You do not own this circuit'
+                }, status=status.HTTP_403_FORBIDDEN)
+                
+            circuit.delete()
+            return Response({
+                'success': True,
+                'message': 'Circuit deleted successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class QuantumCircuitSimulationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """Simulate a quantum circuit"""
+        start_time = time.time()
+        
+        circuit_data = request.data
+        
+        try:
+            # Extract circuit information
+            qubits = circuit_data.get('qubits', 5)
+            gates = circuit_data.get('gates', [])
+            
+            # Simulate quantum circuit (placeholder for actual quantum simulation)
+            # In a real implementation, this would use a quantum computing library like Qiskit or Cirq
+            state_vector = [0.5 for _ in range(2 ** qubits)]
+            probability_distribution = {
+                format(i, f'0{qubits}b'): 1 / (2 ** qubits)
+                for i in range(2 ** qubits)
+            }
+            measurements = [100 for _ in range(2 ** qubits)]
+            
+            execution_time = time.time() - start_time
+            
+            # Create simulation result
+            simulation_result = {
+                'state_vector': state_vector,
+                'probability_distribution': probability_distribution,
+                'measurements': measurements,
+                'execution_time': round(execution_time, 3),
+                'qubit_count': qubits,
+                'gate_count': len(gates)
+            }
+            
+            # If circuit ID is provided, save the simulation result
+            circuit_id = circuit_data.get('circuit_id')
+            if circuit_id:
+                try:
+                    circuit = QuantumCircuit.objects.get(id=circuit_id, user=request.user)
+                    SimulationResult.objects.create(
+                        circuit=circuit,
+                        state_vector=state_vector,
+                        probability_distribution=probability_distribution,
+                        measurements=measurements,
+                        execution_time=execution_time,
+                        qubit_count=qubits,
+                        gate_count=len(gates)
+                    )
+                except QuantumCircuit.DoesNotExist:
+                    pass
+                
+            return Response({
+                'success': True,
+                'data': simulation_result
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': f'Simulation failed: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class QuantumCircuitSimulationResultsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, circuit_id):
+        """Get all simulation results for a specific circuit"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id, user=request.user)
+            simulations = SimulationResult.objects.filter(circuit=circuit).order_by('-created_at')
+            serializer = SimulationResultSerializer(simulations, many=True)
+            
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class QuantumCircuitShareView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, circuit_id):
+        """Share a quantum circuit with other users"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id, user=request.user)
+            share_emails = request.data.get('emails', [])
+            
+            for email in share_emails:
+                try:
+                    user = CustomUser.objects.get(email=email)
+                    circuit.shared_with.add(user)
+                except CustomUser.DoesNotExist:
+                    continue
+                    
+            return Response({
+                'success': True,
+                'message': 'Circuit shared successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, circuit_id):
+        """Remove sharing for a quantum circuit"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id, user=request.user)
+            unshare_emails = request.data.get('emails', [])
+            
+            for email in unshare_emails:
+                try:
+                    user = CustomUser.objects.get(email=email)
+                    circuit.shared_with.remove(user)
+                except CustomUser.DoesNotExist:
+                    continue
+                    
+            return Response({
+                'success': True,
+                'message': 'Sharing removed successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class QuantumCircuitPublicView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, circuit_id):
+        """Make a quantum circuit public or private"""
+        try:
+            circuit = QuantumCircuit.objects.get(id=circuit_id, user=request.user)
+            is_public = request.data.get('is_public', False)
+            
+            circuit.is_public = is_public
+            circuit.save()
+            
+            return Response({
+                'success': True,
+                'data': {
+                    'id': circuit.id,
+                    'is_public': circuit.is_public
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except QuantumCircuit.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Circuit not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class PublicQuantumCircuitsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        """Get all public quantum circuits"""
+        circuits = QuantumCircuit.objects.filter(is_public=True).order_by('-created_at')
+        serializer = QuantumCircuitSerializer(circuits, many=True)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
 
 
 # Google OAuth Views

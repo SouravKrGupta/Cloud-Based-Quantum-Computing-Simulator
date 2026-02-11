@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, QuantumCircuit, SimulationResult
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -57,3 +57,17 @@ class ResetPasswordSerializer(serializers.Serializer):
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
         return attrs
+
+
+class QuantumCircuitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuantumCircuit
+        fields = ['id', 'user', 'name', 'description', 'qubits', 'gates', 'created_at', 'updated_at', 'is_public']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+
+class SimulationResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SimulationResult
+        fields = ['id', 'circuit', 'state_vector', 'probability_distribution', 'measurements', 'execution_time', 'created_at', 'qubit_count', 'gate_count']
+        read_only_fields = ['id', 'created_at']

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+import json
 
 
 class CustomUserManager(BaseUserManager):
@@ -61,3 +62,42 @@ class OTPVerification(models.Model):
 
     def __str__(self):
         return f"OTP for {self.user.email}"
+
+
+class QuantumCircuit(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='circuits')
+    name = models.CharField(max_length=255, default='Untitled Circuit')
+    description = models.TextField(blank=True, null=True)
+    qubits = models.IntegerField(default=5)
+    gates = models.JSONField(default=list)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_public = models.BooleanField(default=False)
+    shared_with = models.ManyToManyField(CustomUser, related_name='shared_circuits', blank=True)
+
+    class Meta:
+        verbose_name = 'Quantum Circuit'
+        verbose_name_plural = 'Quantum Circuits'
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.name} by {self.user.email}"
+
+
+class SimulationResult(models.Model):
+    circuit = models.ForeignKey(QuantumCircuit, on_delete=models.CASCADE, related_name='simulations')
+    state_vector = models.JSONField()
+    probability_distribution = models.JSONField()
+    measurements = models.JSONField()
+    execution_time = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    qubit_count = models.IntegerField()
+    gate_count = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'Simulation Result'
+        verbose_name_plural = 'Simulation Results'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Simulation of {self.circuit.name} at {self.created_at}"
