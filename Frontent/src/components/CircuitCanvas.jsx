@@ -15,6 +15,7 @@ const CircuitCanvas = () => {
   const [draggedGate, setDraggedGate] = useState(null);
   const [editingGate, setEditingGate] = useState(null);
   const [selectedGates, setSelectedGates] = useState(new Set());
+  const [dragOverQubit, setDragOverQubit] = useState(null);
   const gridRef = useRef(null);
 
   const handleDragOver = (e) => {
@@ -22,15 +23,42 @@ const CircuitCanvas = () => {
     e.dataTransfer.dropEffect = 'move';
   };
 
+  const handleDragEnter = (qubitIndex) => {
+    setDragOverQubit(qubitIndex);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverQubit(null);
+  };
+
   const handleDrop = (e, qubitIndex) => {
     e.preventDefault();
-    const gateData = e.dataTransfer.getData('gate');
+    e.stopPropagation();
+    setDragOverQubit(null);
+    
+    // Try to get data from GatePalette (application/json)
+    let gateData = e.dataTransfer.getData('application/json');
+    
+    // Fallback to 'gate' key for compatibility
+    if (!gateData) {
+      gateData = e.dataTransfer.getData('gate');
+    }
+    
     if (gateData) {
-      const gate = JSON.parse(gateData);
-      const rect = gridRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const timeSlot = Math.floor(x / 80); // Assuming 80px per time slot
-      addGate(timeSlot, qubitIndex, gate.name);
+      try {
+        const data = JSON.parse(gateData);
+        const gate = data.gate || data; // Handle both wrapped and direct gate objects
+        const rect = gridRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const timeSlot = Math.max(0, Math.floor(x / 80)); // Assuming 80px per time slot
+        
+        // Add the gate with proper parameters
+        if (gate.name) {
+          addGate(timeSlot, qubitIndex, gate.name, gate.params || {});
+        }
+      } catch (error) {
+        console.error('Error parsing gate data:', error);
+      }
     }
   };
 
@@ -79,26 +107,28 @@ const CircuitCanvas = () => {
   const maxTime = circuit.length > 0 ? Math.max(...circuit.map((g) => g.time)) : 0;
 
   return (
-    <section className="flex-1 bg-gray-900 border-l border-gray-700 overflow-auto">
-      <div className="p-6">
+    <section className="flex-1 bg-gray-900 overflow-auto flex flex-col">
+      <div className="flex-1 flex flex-col p-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Circuit Editor</h2>
-          <div className="flex items-center gap-4">
-            <label className="text-white text-sm">
-              Qubits:
+        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Quantum Circuit</h3>
+          </div>
+          <div className="flex items-center gap-6">
+            <label className="text-gray-400 text-sm flex items-center gap-2">
+              <span>Qubits:</span>
               <input
                 type="number"
                 min="1"
                 max="20"
                 value={qubits}
                 onChange={(e) => setQubits(Math.max(1, parseInt(e.target.value)))}
-                className="ml-2 w-16 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white"
+                className="w-12 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:border-blue-400 focus:outline-none"
               />
             </label>
             {selectedGates.size > 0 && (
-              <div className="text-white text-sm">
-                {selectedGates.size} gate(s) selected
+              <div className="text-blue-400 text-sm font-medium">
+                {selectedGates.size} selected
               </div>
             )}
           </div>
@@ -107,7 +137,7 @@ const CircuitCanvas = () => {
         {/* Circuit Grid */}
         <div
           ref={gridRef}
-          className="border border-gray-700 rounded bg-gray-800 overflow-x-auto"
+          className="flex-1 border border-gray-700 rounded-lg bg-gray-800 overflow-x-auto"
         >
           <div className="inline-block min-w-full">
             {/* Qubit Lines */}
@@ -115,8 +145,14 @@ const CircuitCanvas = () => {
               <div
                 key={`qubit-${qubitIndex}`}
                 onDragOver={handleDragOver}
+                onDragEnter={() => handleDragEnter(qubitIndex)}
+                onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, qubitIndex)}
-                className="border-b border-gray-700 h-20 bg-gray-800 relative"
+                className={`border-b border-gray-700 h-20 relative transition-colors ${
+                  dragOverQubit === qubitIndex 
+                    ? 'bg-blue-900 bg-opacity-30 border-blue-500' 
+                    : 'bg-gray-800 hover:bg-gray-750'
+                }`}
               >
                 {/* Qubit label */}
                 <div className="absolute left-0 top-0 bottom-0 w-12 bg-gray-900 border-r border-gray-700 flex items-center justify-center">
@@ -126,7 +162,11 @@ const CircuitCanvas = () => {
                 </div>
 
                 {/* Qubit wire */}
-                <div className="absolute left-12 right-0 top-1/2 h-0.5 bg-gradient-to-r from-blue-500 to-transparent opacity-50"></div>
+                <div className={`absolute left-12 right-0 top-1/2 h-0.5 opacity-50 ${
+                  dragOverQubit === qubitIndex 
+                    ? 'bg-gradient-to-r from-blue-400 via-blue-400 to-transparent' 
+                    : 'bg-gradient-to-r from-blue-500 to-transparent'
+                }`}></div>
 
                 {/* Time slots */}
                 {Array.from({ length: maxTime + 5 }).map((_, timeIndex) => (

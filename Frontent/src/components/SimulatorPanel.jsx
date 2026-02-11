@@ -45,22 +45,22 @@ const SimulatorPanel = () => {
   };
 
   return (
-    <div className={`bg-gray-800 border-t border-gray-700 transition-all ${
-      showPanel ? 'h-96' : 'h-12'
-    }`}>
+    <div className={`bg-gray-800 border-t border-gray-700 transition-all duration-300 ${
+      showPanel ? 'h-auto' : 'h-14'
+    } flex flex-col`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700 cursor-pointer hover:bg-gray-700" onClick={() => setShowPanel(!showPanel)}>
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Eye size={20} />
+      <div className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-700 transition border-b border-gray-700 flex-shrink-0" onClick={() => setShowPanel(!showPanel)}>
+        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide flex items-center gap-2">
+          <Eye size={16} />
           Visualizations
         </h3>
-        <button className="text-gray-400 hover:text-white">
+        <button className="text-gray-500 hover:text-gray-300 text-lg leading-none">
           {showPanel ? '−' : '+'}
         </button>
       </div>
 
       {showPanel && (
-        <div className="p-4 h-80 overflow-y-auto">
+        <div className="flex-1 p-4 overflow-y-auto max-h-80">
           {/* Visualization Type Selector */}
           <div className="flex gap-4 mb-6 flex-wrap">
             <button

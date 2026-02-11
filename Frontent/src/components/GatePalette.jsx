@@ -1,219 +1,207 @@
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, ChevronDown, ChevronRight, Grid3x3, List } from 'lucide-react';
 
 const GatePalette = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('icons'); // 'list' or 'icons'
   const [expandedCategories, setExpandedCategories] = useState({
-    singleQubit: true,
-    multiQubit: true,
-    parametric: true,
-    measurement: true,
+    hadamard: true,
+    classical: true,
+    phase: true,
+    quantum: true,
+    nonUnitary: true,
   });
 
+  // Comprehensive IBM Quantum Composer gates with colors - matching official design
   const gates = {
-    singleQubit: [
-      { name: 'H', label: 'Hadamard', description: 'Superposition' },
-      { name: 'X', label: 'Pauli X (NOT)', description: 'Bit flip' },
-      { name: 'Y', label: 'Pauli Y', description: 'Bit & phase flip' },
-      { name: 'Z', label: 'Pauli Z', description: 'Phase flip' },
-      { name: 'S', label: 'S Gate', description: 'Phase gate' },
-      { name: 'T', label: 'T Gate', description: 'π/8 phase' },
+    hadamard: [
+      { name: 'H', fullName: 'Hadamard Gate', color: 'bg-red-600' },
     ],
-    multiQubit: [
-      { name: 'CNOT', label: 'CNOT (CX)', description: 'Controlled NOT' },
-      { name: 'SWAP', label: 'SWAP', description: 'Swap qubits' },
-      { name: 'CCX', label: 'Toffoli', description: 'Controlled CNOT' },
+    classical: [
+      { name: 'NOT', fullName: 'Pauli X (NOT)', color: 'bg-blue-600' },
+      { name: 'CNOT', fullName: 'Controlled NOT', color: 'bg-blue-600' },
+      { name: 'CCX', fullName: 'Toffoli Gate', color: 'bg-blue-600' },
+      { name: 'SWAP', fullName: 'SWAP Gate', color: 'bg-blue-600' },
+      { name: 'cSWAP', fullName: 'Controlled SWAP', color: 'bg-blue-600' },
+      { name: 'I', fullName: 'Identity Gate', color: 'bg-blue-600' },
     ],
-    parametric: [
-      { name: 'RX', label: 'RX(θ)', description: 'Rotation X' },
-      { name: 'RY', label: 'RY(θ)', description: 'Rotation Y' },
-      { name: 'RZ', label: 'RZ(θ)', description: 'Rotation Z' },
-      { name: 'U3', label: 'U3(θ,φ,λ)', description: 'General 1Q unitary' },
+    phase: [
+      { name: 'T', fullName: 'T Gate', color: 'bg-cyan-400' },
+      { name: 'S', fullName: 'S Gate', color: 'bg-cyan-400' },
+      { name: 'Z', fullName: 'Pauli Z', color: 'bg-cyan-400' },
+      { name: 'T†', fullName: 'T Dagger', color: 'bg-cyan-400' },
+      { name: 'S†', fullName: 'S Dagger', color: 'bg-cyan-400' },
+      { name: 'Phase', fullName: 'Phase Gate', color: 'bg-cyan-400' },
+      { name: 'RZ', fullName: 'RZ Rotation', color: 'bg-cyan-400' },
+      { name: 'SX', fullName: 'SX Gate', color: 'bg-cyan-400' },
     ],
-    measurement: [
-      { name: 'Measure', label: 'Measure', description: 'Measurement' },
-      { name: 'Reset', label: 'Reset', description: 'Reset qubit' },
+    quantum: [
+      { name: 'SX†', fullName: 'SX Dagger', color: 'bg-purple-600' },
+      { name: 'Y', fullName: 'Pauli Y', color: 'bg-purple-600' },
+      { name: 'U', fullName: 'U3 Gate', color: 'bg-purple-600' },
+      { name: 'IX', fullName: 'X Identity', color: 'bg-purple-600' },
+      { name: 'IY', fullName: 'Y Identity', color: 'bg-purple-600' },
+      { name: 'RXX', fullName: 'RXX Interaction', color: 'bg-purple-600' },
+      { name: 'RZZ', fullName: 'RZZ Interaction', color: 'bg-purple-600' },
+      { name: 'RX', fullName: 'RX Rotation', color: 'bg-purple-600' },
+      { name: 'RY', fullName: 'RY Rotation', color: 'bg-purple-600' },
+      { name: 'RCCX', fullName: 'Simplified Toffoli', color: 'bg-purple-600' },
+      { name: 'RC3X', fullName: 'Simplified 3-Toffoli', color: 'bg-purple-600' },
+    ],
+    nonUnitary: [
+      { name: 'M', fullName: 'Measurement', color: 'bg-gray-600' },
+      { name: '||', fullName: 'Barrier', color: 'bg-gray-600' },
+      { name: 'Reset', fullName: 'Reset Qubit', color: 'bg-gray-600' },
+      { name: 'Control', fullName: 'Control Modifier', color: 'bg-gray-500' },
+      { name: 'if', fullName: 'Conditional Operation', color: 'bg-gray-500' },
     ],
   };
 
+
+  // Category labels for display
+  const categoryLabels = {
+    hadamard: 'Hadamard',
+    classical: 'Classical',
+    phase: 'Phase',
+    quantum: 'Quantum',
+    nonUnitary: 'Visualizations',
+  };
+
+  // Filter gates based on search
   const filteredGates = useMemo(() => {
-    const filtered = {};
+    const result = {};
     Object.entries(gates).forEach(([category, categoryGates]) => {
-      filtered[category] = categoryGates.filter(
-        (gate) =>
-          gate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          gate.label.toLowerCase().includes(searchTerm.toLowerCase())
+      result[category] = categoryGates.filter(gate =>
+        gate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        gate.fullName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     });
-    return filtered;
+    return result;
   }, [searchTerm]);
 
   const toggleCategory = (category) => {
-    setExpandedCategories((prev) => ({
+    setExpandedCategories(prev => ({
       ...prev,
-      [category]: !prev[category],
+      [category]: !prev[category]
     }));
   };
 
   const handleDragStart = (e, gate) => {
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('gate', JSON.stringify(gate));
+    e.dataTransfer.setData('application/json', JSON.stringify({ type: 'gate', gate }));
   };
 
   return (
-    <aside className="w-64 bg-gray-800 border-r border-gray-700 h-screen overflow-y-auto">
+    <aside className="w-72 bg-gray-900 border-r border-gray-700 h-full overflow-y-auto flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
-        <h3 className="text-sm font-semibold text-white mb-3">Operations Catalog</h3>
+      <div className="p-4 border-b border-gray-700 sticky top-0 bg-gray-800 z-10 flex-shrink-0">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Operations</h3>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded transition ${
+                viewMode === 'list'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:bg-gray-700'
+              }`}
+              title="List view"
+            >
+              <List size={14} />
+            </button>
+            <button
+              onClick={() => setViewMode('icons')}
+              className={`p-1.5 rounded transition ${
+                viewMode === 'icons'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:bg-gray-700'
+              }`}
+              title="Icon view"
+            >
+              <Grid3x3 size={14} />
+            </button>
+          </div>
+        </div>
+        
         <div className="relative">
-          <Search size={16} className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           <input
             type="text"
             placeholder="Search gates..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            className="w-full pl-9 pr-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-400 transition"
           />
         </div>
       </div>
 
       {/* Gate Categories */}
-      <div className="p-4 space-y-4">
-        {/* Single Qubit Gates */}
-        <div>
-          <button
-            onClick={() => toggleCategory('singleQubit')}
-            className="flex items-center gap-2 w-full p-2 hover:bg-gray-700 rounded transition text-white font-semibold text-sm"
-          >
-            {expandedCategories.singleQubit ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            Single Qubit
-          </button>
-          {expandedCategories.singleQubit && (
-            <div className="mt-2 space-y-2">
-              {filteredGates.singleQubit.map((gate) => (
-                <div
-                  key={gate.name}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, gate)}
-                  className="p-3 bg-gray-700 rounded cursor-move hover:bg-gray-600 transition group"
-                  title={gate.description}
-                >
-                  <div className="font-semibold text-white text-sm">{gate.name}</div>
-                  <div className="text-xs text-gray-300">{gate.label}</div>
-                  <div className="text-xs text-gray-400 group-hover:text-gray-300">
-                    {gate.description}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="flex-1 overflow-y-auto p-3">
+        {Object.entries(gates).map(([categoryKey, categoryGates]) => {
+          const filtered = filteredGates[categoryKey];
+          if (filtered.length === 0) return null;
 
-        {/* Multi Qubit Gates */}
-        <div>
-          <button
-            onClick={() => toggleCategory('multiQubit')}
-            className="flex items-center gap-2 w-full p-2 hover:bg-gray-700 rounded transition text-white font-semibold text-sm"
-          >
-            {expandedCategories.multiQubit ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            Multi Qubit
-          </button>
-          {expandedCategories.multiQubit && (
-            <div className="mt-2 space-y-2">
-              {filteredGates.multiQubit.map((gate) => (
-                <div
-                  key={gate.name}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, gate)}
-                  className="p-3 bg-gray-700 rounded cursor-move hover:bg-gray-600 transition group"
-                  title={gate.description}
-                >
-                  <div className="font-semibold text-white text-sm">{gate.name}</div>
-                  <div className="text-xs text-gray-300">{gate.label}</div>
-                  <div className="text-xs text-gray-400 group-hover:text-gray-300">
-                    {gate.description}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          const categoryColorMap = {
+            hadamard: { dot: 'bg-red-500', border: 'border-red-900', header: 'hover:text-red-300' },
+            classical: { dot: 'bg-blue-500', border: 'border-blue-900', header: 'hover:text-blue-300' },
+            phase: { dot: 'bg-cyan-500', border: 'border-cyan-900', header: 'hover:text-cyan-300' },
+            quantum: { dot: 'bg-purple-500', border: 'border-purple-900', header: 'hover:text-purple-300' },
+            nonUnitary: { dot: 'bg-gray-500', border: 'border-gray-700', header: 'hover:text-gray-300' },
+          };
 
-        {/* Parametric Gates */}
-        <div>
-          <button
-            onClick={() => toggleCategory('parametric')}
-            className="flex items-center gap-2 w-full p-2 hover:bg-gray-700 rounded transition text-white font-semibold text-sm"
-          >
-            {expandedCategories.parametric ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            Parametric
-          </button>
-          {expandedCategories.parametric && (
-            <div className="mt-2 space-y-2">
-              {filteredGates.parametric.map((gate) => (
-                <div
-                  key={gate.name}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, gate)}
-                  className="p-3 bg-yellow-700 rounded cursor-move hover:bg-yellow-600 transition group"
-                  title={gate.description}
-                >
-                  <div className="font-semibold text-white text-sm">{gate.name}</div>
-                  <div className="text-xs text-yellow-100">{gate.label}</div>
-                  <div className="text-xs text-yellow-200 group-hover:text-yellow-100">
-                    {gate.description}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          const colors = categoryColorMap[categoryKey];
 
-        {/* Measurement Gates */}
-        <div>
-          <button
-            onClick={() => toggleCategory('measurement')}
-            className="flex items-center gap-2 w-full p-2 hover:bg-gray-700 rounded transition text-white font-semibold text-sm"
-          >
-            {expandedCategories.measurement ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            Measurement
-          </button>
-          {expandedCategories.measurement && (
-            <div className="mt-2 space-y-2">
-              {filteredGates.measurement.map((gate) => (
-                <div
-                  key={gate.name}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, gate)}
-                  className="p-3 bg-red-700 rounded cursor-move hover:bg-red-600 transition group"
-                  title={gate.description}
-                >
-                  <div className="font-semibold text-white text-sm">{gate.name}</div>
-                  <div className="text-xs text-red-100">{gate.label}</div>
-                  <div className="text-xs text-red-200 group-hover:text-red-100">
-                    {gate.description}
-                  </div>
+          return (
+            <div key={categoryKey} className="mb-4">
+              {/* Category Header */}
+              <button
+                onClick={() => toggleCategory(categoryKey)}
+                className={`flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-800 rounded transition text-gray-300 ${colors.header} font-semibold text-xs uppercase tracking-wide mb-2`}
+              >
+                <span className={`w-2 h-2 rounded-full ${colors.dot}`}></span>
+                {expandedCategories[categoryKey] ? (
+                  <ChevronDown size={14} />
+                ) : (
+                  <ChevronRight size={14} />
+                )}
+                {categoryLabels[categoryKey]}
+              </button>
+
+              {/* Gates Display */}
+              {expandedCategories[categoryKey] && (
+                <div className={viewMode === 'list' 
+                  ? 'space-y-1 pl-4' 
+                  : 'grid grid-cols-4 gap-2 pl-0'}>
+                  {filtered.map((gate) => (
+                    <div
+                      key={gate.name}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, gate)}
+                      className={`cursor-move transition hover:opacity-90 ${
+                        viewMode === 'list'
+                          ? `p-2 border rounded ${gate.color} border-opacity-40 text-white text-xs flex flex-col`
+                          : `p-3 rounded ${gate.color} text-white flex flex-col items-center justify-center aspect-square text-center hover:shadow-lg`
+                      }`}
+                      title={gate.fullName}
+                    >
+                      {viewMode === 'list' ? (
+                        <>
+                          <div className="font-bold text-sm">{gate.name}</div>
+                          <div className="text-xs opacity-80 leading-tight">{gate.fullName}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="text-lg font-bold leading-tight">{gate.name}</div>
+                          <div className="text-xs opacity-90 leading-tight">{gate.fullName}</div>
+                        </>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
+          );
+        })}
       </div>
     </aside>
   );
