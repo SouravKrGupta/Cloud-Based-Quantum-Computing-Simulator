@@ -14,8 +14,8 @@ const abs2 = (a) => a.re * a.re + a.im * a.im;
 const parseAngle = (value, fallback = 0) => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value !== 'string') return fallback;
-
   const text = value.trim().toLowerCase().replace(/\s+/g, '');
+
   if (text === 'pi') return Math.PI;
   if (text === '-pi') return -Math.PI;
   if (text === 'pi/2') return Math.PI / 2;
@@ -23,8 +23,8 @@ const parseAngle = (value, fallback = 0) => {
   if (text === 'pi/4') return Math.PI / 4;
   if (text === '-pi/4') return -Math.PI / 4;
   if (text.includes('pi')) {
-    const num = Number(text.replace('pi', ''));
-    if (Number.isFinite(num)) return num * Math.PI;
+    const coeff = Number(text.replace('pi', ''));
+    if (Number.isFinite(coeff)) return coeff * Math.PI;
   }
   const n = Number(text);
   return Number.isFinite(n) ? n : fallback;
@@ -57,9 +57,9 @@ const applyCnot = (state, n, control, target) => {
     if ((i & cBit) === 0) continue;
     if ((i & tBit) !== 0) continue;
     const j = i | tBit;
-    const temp = next[i];
+    const tmp = next[i];
     next[i] = next[j];
-    next[j] = temp;
+    next[j] = tmp;
   }
   return next;
 };
@@ -108,10 +108,9 @@ const simulateStatevector = (circuit, qubits) => {
         state = applySingleQubitGate(state, n, q, c(1, 0), c(0, 0), c(0, 0), c(Math.cos(p), Math.sin(p)));
         break;
       }
-      case 'P': {
+      case 'P':
         state = applySingleQubitGate(state, n, q, c(1, 0), c(0, 0), c(0, 0), c(Math.cos(angle), Math.sin(angle)));
         break;
-      }
       case 'RX': {
         const ct = Math.cos(angle / 2);
         const st = Math.sin(angle / 2);
@@ -132,19 +131,10 @@ const simulateStatevector = (circuit, qubits) => {
       case 'CNOT':
       case 'CX': {
         const rawControl = Number(gateOp?.params?.control);
-        const control = Number.isInteger(rawControl)
-          ? Math.max(0, Math.min(n - 1, rawControl))
-          : q === 0
-          ? 1
-          : q - 1;
+        const control = Number.isInteger(rawControl) ? Math.max(0, Math.min(n - 1, rawControl)) : q === 0 ? 1 : q - 1;
         state = applyCnot(state, n, control, q);
         break;
       }
-      case 'MEASURE':
-      case 'RESET':
-      case 'BARRIER':
-      case 'I':
-      case 'ID':
       default:
         break;
     }
@@ -163,25 +153,26 @@ const SimulatorPanel = () => {
   const [rightView, setRightView] = useState('Q-sphere');
 
   const sim = useMemo(() => simulateStatevector(circuit, qubits), [circuit, qubits]);
-
-  const states = useMemo(() => {
-    return sim.statevector.map((amp, i) => ({
-      state: i.toString(2).padStart(sim.n, '0'),
-      amplitude: Math.sqrt(abs2(amp)),
-      probability: abs2(amp),
-      phase: Math.atan2(amp.im, amp.re),
-    }));
-  }, [sim]);
+  const states = useMemo(
+    () =>
+      sim.statevector.map((amp, i) => ({
+        state: i.toString(2).padStart(sim.n, '0'),
+        amplitude: Math.sqrt(abs2(amp)),
+        probability: abs2(amp),
+        phase: Math.atan2(amp.im, amp.re),
+      })),
+    [sim]
+  );
 
   const top = useMemo(() => [...states].sort((a, b) => b.probability - a.probability).slice(0, 8), [states]);
 
-  const renderBarChart = (items, ylabel) => (
+  const renderBarChart = (items, yLabel) => (
     <div className="h-full flex flex-col">
-      <div className="flex-1 border border-slate-300 rounded bg-white p-3">
+      <div className="flex-1 border border-gray-700 rounded bg-gray-900 p-3">
         <div className="relative h-full">
-          <div className="absolute left-8 top-2 bottom-8 border-l border-slate-300" />
-          <div className="absolute left-8 right-2 bottom-8 border-b border-slate-300" />
-          <div className="absolute left-0 top-2 bottom-8 flex flex-col justify-between text-xs text-slate-500">
+          <div className="absolute left-8 top-2 bottom-8 border-l border-gray-700" />
+          <div className="absolute left-8 right-2 bottom-8 border-b border-gray-700" />
+          <div className="absolute left-0 top-2 bottom-8 flex flex-col justify-between text-xs text-gray-500">
             <span>100</span>
             <span>80</span>
             <span>60</span>
@@ -193,7 +184,7 @@ const SimulatorPanel = () => {
             {items.map((item) => (
               <div key={item.state} className="flex-1 min-w-[8px] flex items-end justify-center">
                 <div
-                  className="w-full bg-sky-400"
+                  className="w-full bg-cyan-500"
                   style={{ height: `${Math.max(2, item.value * 100)}%` }}
                   title={`${item.state}: ${(item.value * 100).toFixed(2)}%`}
                 />
@@ -202,12 +193,12 @@ const SimulatorPanel = () => {
           </div>
           <div className="absolute left-10 right-2 bottom-0 flex gap-1">
             {items.map((item) => (
-              <span key={`l-${item.state}`} className="flex-1 text-[10px] text-slate-500 rotate-[-65deg] origin-top-left">
+              <span key={`label-${item.state}`} className="flex-1 text-[10px] text-gray-500 rotate-[-65deg] origin-top-left">
                 {item.state}
               </span>
             ))}
           </div>
-          <div className="absolute -left-4 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-slate-500">{ylabel}</div>
+          <div className="absolute -left-4 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-gray-500">{yLabel}</div>
         </div>
       </div>
     </div>
@@ -217,11 +208,11 @@ const SimulatorPanel = () => {
     const display = top.slice(0, 6);
     return (
       <div className="h-full flex flex-col">
-        <div className="flex-1 border border-slate-300 rounded bg-white p-3 relative overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-56 h-56 rounded-full border border-slate-300 bg-slate-100">
-              <div className="absolute top-1/2 left-0 right-0 border-t border-slate-300" />
-              <div className="absolute top-[68%] left-[14%] right-[14%] h-10 border border-slate-300 rounded-full" />
+        <div className="flex-1 border border-gray-700 rounded bg-gray-900 p-3 relative overflow-hidden">
+          <div className="absolute inset-x-0 top-0 bottom-20 flex items-center justify-center">
+            <div className="relative w-56 h-56 rounded-full border border-gray-700 bg-gray-800">
+              <div className="absolute top-1/2 left-0 right-0 border-t border-gray-700" />
+              <div className="absolute top-[68%] left-[14%] right-[14%] h-10 border border-gray-700 rounded-full" />
               {display.map((item, idx) => {
                 const theta = (idx / Math.max(1, display.length)) * Math.PI * 2;
                 const r = 58 * (0.35 + item.probability);
@@ -231,14 +222,14 @@ const SimulatorPanel = () => {
                 return (
                   <div
                     key={`q-${item.state}`}
-                    className="absolute rounded-full border border-white/70"
+                    className="absolute rounded-full border border-white/60"
                     style={{
                       left: `calc(50% + ${x}px)`,
                       top: `calc(50% + ${y}px)`,
                       width: `${size}px`,
                       height: `${size}px`,
                       transform: 'translate(-50%, -50%)',
-                      background: `hsl(${((item.phase + Math.PI) / (2 * Math.PI)) * 360}deg 80% 55%)`,
+                      background: `hsl(${((item.phase + Math.PI) / (2 * Math.PI)) * 360}deg 75% 55%)`,
                     }}
                     title={`|${item.state}> P=${(item.probability * 100).toFixed(1)}% phase=${item.phase.toFixed(2)}`}
                   />
@@ -247,9 +238,18 @@ const SimulatorPanel = () => {
             </div>
           </div>
 
-          <div className="absolute bottom-4 left-4 text-xs text-slate-600">
+          <div className="absolute bottom-16 left-3 text-xs text-gray-400">
             <div>Top state: |{top[0]?.state || '0'.repeat(sim.n)}&gt;</div>
             <div>Probability: {((top[0]?.probability || 1) * 100).toFixed(2)}%</div>
+          </div>
+          <div className="absolute bottom-2 left-3 right-3 text-[10px] text-gray-400">
+            <div className="grid grid-cols-3 gap-2 border-t border-gray-700 pt-2">
+              {display.slice(0, 3).map((item) => (
+                <div key={`qv-${item.state}`} className="truncate">
+                  |{item.state}&gt; {(item.probability * 100).toFixed(1)}%
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -267,12 +267,12 @@ const SimulatorPanel = () => {
   };
 
   const renderHeader = (view, onChange, options) => (
-    <div className="flex items-center justify-between px-3 py-2 border-b border-slate-300 bg-slate-50">
+    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-900">
       <div className="relative">
         <select
           value={view}
           onChange={(e) => onChange(e.target.value)}
-          className="appearance-none bg-white border border-slate-300 rounded px-2 py-1 pr-7 text-lg text-slate-700"
+          className="appearance-none bg-gray-800 border border-gray-700 rounded px-2 py-1 pr-7 text-lg text-gray-100"
         >
           {options.map((option) => (
             <option key={option} value={option}>
@@ -280,13 +280,13 @@ const SimulatorPanel = () => {
             </option>
           ))}
         </select>
-        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+        <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
       </div>
       <div className="flex items-center gap-2">
-        <button className="text-slate-500 hover:text-slate-700" title={`About ${view}`}>
+        <button className="text-gray-500 hover:text-gray-200" title={`About ${view}`}>
           <Info size={16} />
         </button>
-        <button className="text-slate-500 hover:text-slate-700" title="Panel options">
+        <button className="text-gray-500 hover:text-gray-200" title="Panel options">
           <MoreVertical size={16} />
         </button>
       </div>
@@ -294,20 +294,18 @@ const SimulatorPanel = () => {
   );
 
   return (
-    <section className={`bg-slate-100 border-t border-slate-300 transition-all ${showPanel ? 'h-[340px]' : 'h-12'}`}>
-      <div className="h-12 px-4 flex items-center justify-between bg-slate-50 border-b border-slate-300">
-        <button onClick={() => setShowPanel((prev) => !prev)} className="text-sm text-slate-700 flex items-center gap-1">
+    <section className={`bg-gray-950 border-t border-gray-700 transition-all ${showPanel ? 'h-[340px]' : 'h-12'}`}>
+      <div className="h-12 px-4 flex items-center justify-between bg-gray-900 border-b border-gray-700">
+        <button onClick={() => setShowPanel((prev) => !prev)} className="text-sm text-gray-200 flex items-center gap-1">
           Visualizations
           <ChevronDown size={16} className={`${showPanel ? '' : '-rotate-90'} transition-transform`} />
         </button>
-        {showPanel && (
-          <span className="text-xs text-slate-500">Live update while drag & drop</span>
-        )}
+        {showPanel && <span className="text-xs text-gray-500">Live from drag-drop operations</span>}
       </div>
 
       {showPanel && (
         <div className="h-[288px] grid grid-cols-1 lg:grid-cols-2">
-          <div className="border-r border-slate-300 flex flex-col">
+          <div className="border-r border-gray-700 flex flex-col">
             {renderHeader(leftView, setLeftView, LEFT_PANEL_OPTIONS)}
             <div className="flex-1 p-2">{renderPanel(leftView)}</div>
           </div>

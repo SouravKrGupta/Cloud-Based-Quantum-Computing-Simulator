@@ -2,6 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
+  const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
+  const secondaryCtaRoute = isLoggedIn ? '/profile' : '/signup';
+  const secondaryCtaLabel = isLoggedIn ? 'Go to Profile' : 'Get Started for Free';
+  const footerCtaLabel = isLoggedIn ? 'Go to Profile' : 'Sign Up Free';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Hero Section */}
@@ -36,10 +41,10 @@ const Home = () => {
               Launch Quantum Composer
             </Link>
             <Link 
-              to="/signup" 
+              to={secondaryCtaRoute}
               className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300 border border-white/20"
             >
-              Get Started for Free
+              {secondaryCtaLabel}
             </Link>
           </div>
         </div>
@@ -160,10 +165,10 @@ const Home = () => {
               Launch Quantum Composer
             </Link>
             <Link 
-              to="/signup" 
+              to={secondaryCtaRoute}
               className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300 border border-white/20"
             >
-              Sign Up Free
+              {footerCtaLabel}
             </Link>
           </div>
         </div>
