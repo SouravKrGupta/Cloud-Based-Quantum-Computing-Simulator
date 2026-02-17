@@ -1,25 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { useCircuit } from '../context/CircuitContext';
-import { Copy, File, Download, RefreshCw, Code2, Settings } from 'lucide-react';
+import { Copy, Download, Code2 } from 'lucide-react';
 
 const CodePanel = () => {
   const { generateOpenQASM, circuit, circuitName, qubits, classicalBits } = useCircuit();
   const [copied, setCopied] = useState(false);
-  const [shareSessionId, setShareSessionId] = useState(null);
+  const [sessionId] = useState(
+    () => `QC_${Date.now()}_${Math.random().toString(36).slice(2, 11).toUpperCase()}`
+  );
 
   const openQasmCode = useMemo(() => {
     return generateOpenQASM();
   }, [circuit, generateOpenQASM]);
-
-  // Generate a session ID on component mount
-  const sessionId = useMemo(() => {
-    if (!shareSessionId) {
-      const id = `QC_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-      setShareSessionId(id);
-      return id;
-    }
-    return shareSessionId;
-  }, [shareSessionId]);
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(openQasmCode);

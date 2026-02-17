@@ -276,6 +276,44 @@ const Documentation = () => {
         </div>
       </section>
 
+      {/* External Reference Links */}
+      <section className="px-4 pb-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-slate-800/60 rounded-2xl p-6 border border-slate-700">
+            <h2 className="text-xl font-semibold text-purple-300 mb-4">Reference Resources</h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              <a
+                href="https://quantum.cloud.ibm.com/composer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:border-blue-500 transition"
+              >
+                <p className="text-white font-semibold">IBM Quantum Composer</p>
+                <p className="text-gray-400 text-sm mt-1">Official UI inspiration and workflow.</p>
+              </a>
+              <a
+                href="https://zxcalc.github.io/book/html/main_html.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:border-blue-500 transition"
+              >
+                <p className="text-white font-semibold">ZX Calculus Book</p>
+                <p className="text-gray-400 text-sm mt-1">Conceptual reference for diagram reasoning.</p>
+              </a>
+              <a
+                href="https://zxcalculus.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:border-blue-500 transition"
+              >
+                <p className="text-white font-semibold">ZXCalculus.com</p>
+                <p className="text-gray-400 text-sm mt-1">Interactive ZX examples and terminology.</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Documentation Content */}
       <section className="px-4 py-12">
         <div className="max-w-7xl mx-auto">

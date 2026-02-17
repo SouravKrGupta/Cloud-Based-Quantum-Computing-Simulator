@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCircuit } from '../context/CircuitContext';
 import {
   RotateCcw,
@@ -14,7 +15,8 @@ import {
   Download,
 } from 'lucide-react';
 
-const Toolbar = () => {
+const Toolbar = ({ onRun }) => {
+  const navigate = useNavigate();
   const {
     mode,
     setMode,
@@ -24,7 +26,6 @@ const Toolbar = () => {
     circuitName,
     setCircuitName,
     saveCircuit,
-    getSavedCircuits,
   } = useCircuit();
 
   const [showMenu, setShowMenu] = useState(false);
@@ -223,12 +224,14 @@ const Toolbar = () => {
         {/* Right section: View & Execute */}
         <div className="flex items-center gap-2">
           <button
+            onClick={() => navigate('/code-view')}
             className="p-2 rounded hover:bg-gray-800 transition flex items-center gap-1"
             title="View Code"
           >
             <Code size={20} />
           </button>
           <button
+            onClick={onRun}
             className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 transition flex items-center gap-2"
             title="Run Circuit"
           >

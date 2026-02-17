@@ -1,207 +1,131 @@
-import React, { useState, useMemo } from 'react';
-import { Search, ChevronDown, ChevronRight, Grid3x3, List } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Search, ChevronDown, ChevronRight } from 'lucide-react';
+
+const GATE_CATEGORIES = {
+  operations: {
+    label: 'Operations',
+    gates: [
+      { name: 'H', fullName: 'Hadamard' },
+      { name: 'CNOT', fullName: 'Controlled NOT' },
+      { name: 'CCX', fullName: 'Toffoli' },
+      { name: 'SWAP', fullName: 'Swap' },
+      { name: 'I', fullName: 'Identity' },
+      { name: 'X', fullName: 'Pauli X' },
+      { name: 'Y', fullName: 'Pauli Y' },
+    ],
+    dot: 'bg-blue-500',
+  },
+  phase: {
+    label: 'Phase',
+    gates: [
+      { name: 'T', fullName: 'T Gate' },
+      { name: 'S', fullName: 'S Gate' },
+      { name: 'Z', fullName: 'Pauli Z' },
+      { name: 'Tdg', fullName: 'T Dagger' },
+      { name: 'Sdg', fullName: 'S Dagger' },
+      { name: 'P', fullName: 'Phase' },
+      { name: 'RZ', fullName: 'RZ Rotation' },
+      { name: 'RX', fullName: 'RX Rotation' },
+      { name: 'RY', fullName: 'RY Rotation' },
+    ],
+    dot: 'bg-cyan-500',
+  },
+  nonUnitary: {
+    label: 'Non-unitary & modifiers',
+    gates: [
+      { name: 'Measure', fullName: 'Measurement' },
+      { name: 'Reset', fullName: 'Reset qubit' },
+      { name: 'Barrier', fullName: 'Barrier' },
+      { name: 'Control', fullName: 'Control modifier' },
+      { name: 'if', fullName: 'Conditional' },
+    ],
+    dot: 'bg-gray-500',
+  },
+};
+
+const colorForGate = (gateName) => {
+  if (['Measure', 'Reset', 'Barrier', 'Control', 'if'].includes(gateName)) return 'bg-gray-600';
+  if (['RX', 'RY', 'RZ', 'P'].includes(gateName)) return 'bg-cyan-500';
+  if (gateName === 'H') return 'bg-red-500';
+  return 'bg-blue-700';
+};
 
 const GatePalette = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('icons'); // 'list' or 'icons'
-  const [expandedCategories, setExpandedCategories] = useState({
-    hadamard: true,
-    classical: true,
+  const [expanded, setExpanded] = useState({
+    operations: true,
     phase: true,
-    quantum: true,
     nonUnitary: true,
   });
 
-  // Comprehensive IBM Quantum Composer gates with colors - matching official design
-  const gates = {
-    hadamard: [
-      { name: 'H', fullName: 'Hadamard Gate', color: 'bg-red-600' },
-    ],
-    classical: [
-      { name: 'NOT', fullName: 'Pauli X (NOT)', color: 'bg-blue-600' },
-      { name: 'CNOT', fullName: 'Controlled NOT', color: 'bg-blue-600' },
-      { name: 'CCX', fullName: 'Toffoli Gate', color: 'bg-blue-600' },
-      { name: 'SWAP', fullName: 'SWAP Gate', color: 'bg-blue-600' },
-      { name: 'cSWAP', fullName: 'Controlled SWAP', color: 'bg-blue-600' },
-      { name: 'I', fullName: 'Identity Gate', color: 'bg-blue-600' },
-    ],
-    phase: [
-      { name: 'T', fullName: 'T Gate', color: 'bg-cyan-400' },
-      { name: 'S', fullName: 'S Gate', color: 'bg-cyan-400' },
-      { name: 'Z', fullName: 'Pauli Z', color: 'bg-cyan-400' },
-      { name: 'T†', fullName: 'T Dagger', color: 'bg-cyan-400' },
-      { name: 'S†', fullName: 'S Dagger', color: 'bg-cyan-400' },
-      { name: 'Phase', fullName: 'Phase Gate', color: 'bg-cyan-400' },
-      { name: 'RZ', fullName: 'RZ Rotation', color: 'bg-cyan-400' },
-      { name: 'SX', fullName: 'SX Gate', color: 'bg-cyan-400' },
-    ],
-    quantum: [
-      { name: 'SX†', fullName: 'SX Dagger', color: 'bg-purple-600' },
-      { name: 'Y', fullName: 'Pauli Y', color: 'bg-purple-600' },
-      { name: 'U', fullName: 'U3 Gate', color: 'bg-purple-600' },
-      { name: 'IX', fullName: 'X Identity', color: 'bg-purple-600' },
-      { name: 'IY', fullName: 'Y Identity', color: 'bg-purple-600' },
-      { name: 'RXX', fullName: 'RXX Interaction', color: 'bg-purple-600' },
-      { name: 'RZZ', fullName: 'RZZ Interaction', color: 'bg-purple-600' },
-      { name: 'RX', fullName: 'RX Rotation', color: 'bg-purple-600' },
-      { name: 'RY', fullName: 'RY Rotation', color: 'bg-purple-600' },
-      { name: 'RCCX', fullName: 'Simplified Toffoli', color: 'bg-purple-600' },
-      { name: 'RC3X', fullName: 'Simplified 3-Toffoli', color: 'bg-purple-600' },
-    ],
-    nonUnitary: [
-      { name: 'M', fullName: 'Measurement', color: 'bg-gray-600' },
-      { name: '||', fullName: 'Barrier', color: 'bg-gray-600' },
-      { name: 'Reset', fullName: 'Reset Qubit', color: 'bg-gray-600' },
-      { name: 'Control', fullName: 'Control Modifier', color: 'bg-gray-500' },
-      { name: 'if', fullName: 'Conditional Operation', color: 'bg-gray-500' },
-    ],
-  };
+  const filtered = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return GATE_CATEGORIES;
 
-
-  // Category labels for display
-  const categoryLabels = {
-    hadamard: 'Hadamard',
-    classical: 'Classical',
-    phase: 'Phase',
-    quantum: 'Quantum',
-    nonUnitary: 'Visualizations',
-  };
-
-  // Filter gates based on search
-  const filteredGates = useMemo(() => {
-    const result = {};
-    Object.entries(gates).forEach(([category, categoryGates]) => {
-      result[category] = categoryGates.filter(gate =>
-        gate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        gate.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+    const reduced = {};
+    Object.entries(GATE_CATEGORIES).forEach(([key, value]) => {
+      const gates = value.gates.filter(
+        (gate) =>
+          gate.name.toLowerCase().includes(term) ||
+          gate.fullName.toLowerCase().includes(term)
       );
+      if (gates.length > 0) {
+        reduced[key] = { ...value, gates };
+      }
     });
-    return result;
+    return reduced;
   }, [searchTerm]);
 
-  const toggleCategory = (category) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
-  };
-
-  const handleDragStart = (e, gate) => {
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('application/json', JSON.stringify({ type: 'gate', gate }));
+  const handleDragStart = (event, gate) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('application/json', JSON.stringify({ type: 'gate', gate }));
   };
 
   return (
-    <aside className="w-72 bg-gray-900 border-r border-gray-700 h-full overflow-y-auto flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-700 sticky top-0 bg-gray-800 z-10 flex-shrink-0">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-white uppercase tracking-wide">Operations</h3>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded transition ${
-                viewMode === 'list'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-700'
-              }`}
-              title="List view"
-            >
-              <List size={14} />
-            </button>
-            <button
-              onClick={() => setViewMode('icons')}
-              className={`p-1.5 rounded transition ${
-                viewMode === 'icons'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-700'
-              }`}
-              title="Icon view"
-            >
-              <Grid3x3 size={14} />
-            </button>
-          </div>
-        </div>
-        
+    <aside className="w-80 bg-gray-900 border-r border-gray-700 h-full overflow-y-auto">
+      <div className="p-4 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
+        <h3 className="text-white text-2xl font-semibold mb-3">Operations</h3>
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
             type="text"
-            placeholder="Search gates..."
+            placeholder="Search gate"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-400 transition"
+            className="w-full pl-9 pr-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-400"
           />
         </div>
       </div>
 
-      {/* Gate Categories */}
-      <div className="flex-1 overflow-y-auto p-3">
-        {Object.entries(gates).map(([categoryKey, categoryGates]) => {
-          const filtered = filteredGates[categoryKey];
-          if (filtered.length === 0) return null;
+      <div className="p-3 space-y-4">
+        {Object.entries(filtered).map(([key, category]) => (
+          <section key={key}>
+            <button
+              onClick={() => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))}
+              className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-800 text-left"
+            >
+              <span className={`w-2 h-2 rounded-full ${category.dot}`} />
+              {expanded[key] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              <span className="text-sm font-semibold text-gray-200">{category.label}</span>
+            </button>
 
-          const categoryColorMap = {
-            hadamard: { dot: 'bg-red-500', border: 'border-red-900', header: 'hover:text-red-300' },
-            classical: { dot: 'bg-blue-500', border: 'border-blue-900', header: 'hover:text-blue-300' },
-            phase: { dot: 'bg-cyan-500', border: 'border-cyan-900', header: 'hover:text-cyan-300' },
-            quantum: { dot: 'bg-purple-500', border: 'border-purple-900', header: 'hover:text-purple-300' },
-            nonUnitary: { dot: 'bg-gray-500', border: 'border-gray-700', header: 'hover:text-gray-300' },
-          };
-
-          const colors = categoryColorMap[categoryKey];
-
-          return (
-            <div key={categoryKey} className="mb-4">
-              {/* Category Header */}
-              <button
-                onClick={() => toggleCategory(categoryKey)}
-                className={`flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-800 rounded transition text-gray-300 ${colors.header} font-semibold text-xs uppercase tracking-wide mb-2`}
-              >
-                <span className={`w-2 h-2 rounded-full ${colors.dot}`}></span>
-                {expandedCategories[categoryKey] ? (
-                  <ChevronDown size={14} />
-                ) : (
-                  <ChevronRight size={14} />
-                )}
-                {categoryLabels[categoryKey]}
-              </button>
-
-               {/* Gates Display */}
-               {expandedCategories[categoryKey] && (
-                 <div className={viewMode === 'list' 
-                   ? 'space-y-1 pl-4' 
-                   : 'grid grid-cols-5 gap-1 pl-0'}>
-                   {filtered.map((gate) => (
-                     <div
-                       key={gate.name}
-                       draggable
-                       onDragStart={(e) => handleDragStart(e, gate)}
-                       className={`cursor-move transition hover:opacity-90 ${
-                         viewMode === 'list'
-                           ? `p-1.5 border rounded ${gate.color} border-opacity-40 text-white text-xs flex flex-col`
-                           : `p-1.5 rounded ${gate.color} text-white flex flex-col items-center justify-center aspect-square text-center hover:shadow-lg`
-                       }`}
-                       title={gate.fullName}
-                     >
-                       {viewMode === 'list' ? (
-                         <>
-                           <div className="font-bold text-xs">{gate.name}</div>
-                           <div className="text-xs opacity-80 leading-tight">{gate.fullName}</div>
-                         </>
-                       ) : (
-                         <>
-                           <div className="text-sm font-bold leading-tight">{gate.name}</div>
-                           <div className="text-xs opacity-90 leading-tight">{gate.fullName}</div>
-                         </>
-                       )}
-                     </div>
-                   ))}
-                 </div>
-              )}
-            </div>
-          );
-        })}
+            {expanded[key] && (
+              <div className="grid grid-cols-6 gap-2 mt-2">
+                {category.gates.map((gate) => (
+                  <div
+                    key={`${key}-${gate.name}`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, gate)}
+                    className={`${colorForGate(gate.name)} cursor-move rounded text-white h-10 flex items-center justify-center text-sm font-semibold hover:opacity-85`}
+                    title={gate.fullName}
+                  >
+                    {gate.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        ))}
       </div>
     </aside>
   );

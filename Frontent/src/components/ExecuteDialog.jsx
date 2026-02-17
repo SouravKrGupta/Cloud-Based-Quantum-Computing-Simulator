@@ -3,7 +3,7 @@ import { useCircuit } from '../context/CircuitContext';
 import { Play, StopCircle, Settings } from 'lucide-react';
 
 const ExecuteDialog = ({ onClose }) => {
-  const { circuit, generateOpenQASM, setExecution } = useCircuit();
+  const { circuit, qubits, setExecution } = useCircuit();
   const [backend, setBackend] = useState('simulator');
   const [shots, setShots] = useState(1000);
   const [isRunning, setIsRunning] = useState(false);
@@ -22,21 +22,34 @@ const ExecuteDialog = ({ onClose }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
         body: JSON.stringify({
           qubits,
           gates: circuit,
+          backend,
           shots,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
+        const probabilities = data?.data?.probability_distribution || {};
+        const derivedCounts = Object.fromEntries(
+          Object.entries(probabilities).map(([state, probability]) => [
+            state,
+            Math.round((probability || 0) * shots),
+          ])
+        );
+
         setExecution({
-          jobId: data.data.job_id,
+          jobId: data.data.job_id || `SIM-${Date.now()}`,
           status: 'completed',
-          result: data.data,
+          result: {
+            ...data.data,
+            counts: derivedCounts,
+            shots,
+          },
         });
         onClose();
       } else {

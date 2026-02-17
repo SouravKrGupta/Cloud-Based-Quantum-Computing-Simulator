@@ -1,7 +1,6 @@
 import random
 import string
 import time
-import json
 from datetime import timedelta
 from django.utils import timezone
 from django.conf import settings
@@ -11,8 +10,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from django.shortcuts import redirect
-from social_django.utils import psa
 from .models import CustomUser, OTPVerification, QuantumCircuit, SimulationResult
 from .serializers import (
     UserRegistrationSerializer,
@@ -32,7 +29,7 @@ class HealthCheckView(APIView):
     def get(self, request):
         return Response({
             'status': 'ok',
-            'message': 'API is working fine and ready to serve requests. Welcome to QuantumSim API! 🚀',
+            'message': 'API is working fine and ready to serve requests. Welcome to QuantumSim API!',
             'timestamp': timezone.now().isoformat(),
             'application': {
                 'name': 'QuantumSim',
@@ -54,17 +51,6 @@ class HealthCheckView(APIView):
                 'email_service': 'available',
                 'social_auth': 'enabled'
             }
-        }, status=status.HTTP_200_OK)
-
-
-class HealthCheckView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        return Response({
-            'status': 'ok',
-            'message': 'API is working fine and ready to serve requests. Welcome to QuantumSim API! 🚀 create by zypject.com',
-            'timestamp': timezone.now().isoformat()
         }, status=status.HTTP_200_OK)
 
 
@@ -486,7 +472,6 @@ class QuantumCircuitSimulationView(APIView):
             from qiskit import QuantumCircuit as QiskitCircuit
             from qiskit.quantum_info import Statevector
             from qiskit_aer import AerSimulator
-            import numpy as np
             
             # Create Qiskit quantum circuit
             qc = QiskitCircuit(qubits)
@@ -526,21 +511,19 @@ class QuantumCircuitSimulationView(APIView):
                     qc.measure(qubit_index, classical_bit)
             
             # Simulate the circuit to get state vector (without measurements)
-            # Remove measurements for state vector simulation
             qc_no_measure = qc.copy()
-            for instruction in qc_no_measure.data:
-                if instruction.operation.name == 'measure':
-                    qc_no_measure.data.remove(instruction)
-            
-            state_vector = Statevector.from_instruction(qc_no_measure).data
-            state_vector = [complex(x).real for x in state_vector]
+            qc_no_measure.remove_final_measurements(inplace=True)
+            state_vector_complex = Statevector.from_instruction(qc_no_measure).data
+            state_vector = [str(complex(amplitude)) for amplitude in state_vector_complex]
             
             # Simulate measurements if there are any measure operations
             probability_distribution = {}
             measurements = []
+            requested_shots = int(circuit_data.get('shots', 1000))
+            shots = max(100, min(requested_shots, 10000))
+
             if any(instruction.operation.name == 'measure' for instruction in qc.data):
                 simulator = AerSimulator()
-                shots = 1000
                 result = simulator.run(qc, shots=shots).result()
                 counts = result.get_counts()
                 
@@ -552,9 +535,9 @@ class QuantumCircuitSimulationView(APIView):
                 # If no measurements, use state vector probabilities
                 for state in range(2 ** qubits):
                     state_str = format(state, f'0{qubits}b')
-                    probability = abs(state_vector[state]) ** 2
+                    probability = abs(state_vector_complex[state]) ** 2
                     probability_distribution[state_str] = probability
-                    measurements.append(int(probability * 1000))
+                    measurements.append(int(probability * shots))
             
             execution_time = time.time() - start_time
             
@@ -563,6 +546,7 @@ class QuantumCircuitSimulationView(APIView):
                 'state_vector': state_vector,
                 'probability_distribution': probability_distribution,
                 'measurements': measurements,
+                'shots': shots,
                 'execution_time': round(execution_time, 3),
                 'qubit_count': qubits,
                 'gate_count': len(gates)

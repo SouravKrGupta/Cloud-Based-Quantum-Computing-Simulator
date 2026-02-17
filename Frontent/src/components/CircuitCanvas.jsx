@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useCircuit } from '../context/CircuitContext';
 import { Trash2, Edit2, X } from 'lucide-react';
 
@@ -12,7 +12,6 @@ const CircuitCanvas = () => {
     updateGate,
     setQubits,
   } = useCircuit();
-  const [draggedGate, setDraggedGate] = useState(null);
   const [editingGate, setEditingGate] = useState(null);
   const [selectedGates, setSelectedGates] = useState(new Set());
   const [dragOverQubit, setDragOverQubit] = useState(null);
@@ -52,9 +51,25 @@ const CircuitCanvas = () => {
         const x = e.clientX - rect.left;
         const timeSlot = Math.max(0, Math.floor(x / 80)); // Assuming 80px per time slot
         
+        const rawGateName = gate.name || gate.gate || '';
+        const gateMap = {
+          NOT: 'X',
+          M: 'Measure',
+          Phase: 'P',
+          CX: 'CNOT',
+        };
+        const normalizedGateName = gateMap[rawGateName] || rawGateName;
+
         // Add the gate with proper parameters
         if (gate.name) {
-          addGate(timeSlot, qubitIndex, gate.name, gate.params || {});
+          const params = { ...(gate.params || {}) };
+          if (normalizedGateName === 'Measure') {
+            params.classicalBit = Number.isInteger(params.classicalBit) ? params.classicalBit : qubitIndex;
+          }
+          if (['RX', 'RY', 'RZ', 'P'].includes(normalizedGateName) && params.angle === undefined) {
+            params.angle = normalizedGateName === 'P' ? 'pi/2' : 0;
+          }
+          addGate(timeSlot, qubitIndex, normalizedGateName, params);
         }
       } catch (error) {
         console.error('Error parsing gate data:', error);
@@ -151,7 +166,7 @@ const CircuitCanvas = () => {
                 className={`border-b border-gray-700 h-20 relative transition-colors ${
                   dragOverQubit === qubitIndex 
                     ? 'bg-blue-900 bg-opacity-30 border-blue-500' 
-                    : 'bg-gray-800 hover:bg-gray-750'
+                    : 'bg-gray-800 hover:bg-gray-700'
                 }`}
               >
                 {/* Qubit label */}

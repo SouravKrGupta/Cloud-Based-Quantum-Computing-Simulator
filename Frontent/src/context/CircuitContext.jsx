@@ -21,18 +21,32 @@ export const CircuitProvider = ({ children }) => {
   });
   const [customGates, setCustomGates] = useState([]);
 
+  const normalizeGateName = useCallback((gateName) => {
+    const map = {
+      NOT: 'X',
+      M: 'Measure',
+      MEASURE: 'Measure',
+      PHASE: 'P',
+      Tdg: 'Tdg',
+      Sdg: 'Sdg',
+      CX: 'CNOT',
+    };
+    return map[gateName] || gateName;
+  }, []);
+
   // Add gate to circuit
   const addGate = useCallback((time, qubitIndex, gate, params = {}) => {
+    const normalizedGate = normalizeGateName(gate);
     const newGate = {
       id: Date.now(),
       time,
       qubitIndex,
-      gate,
+      gate: normalizedGate,
       params,
     };
     setCircuit((prev) => [...prev, newGate]);
     return newGate;
-  }, []);
+  }, [normalizeGateName]);
 
   // Remove gate from circuit
   const removeGate = useCallback((gateId) => {
@@ -61,7 +75,9 @@ export const CircuitProvider = ({ children }) => {
 
     const sortedGates = [...circuit].sort((a, b) => a.time - b.time);
     sortedGates.forEach((g) => {
-      switch (g.gate) {
+      const gate = normalizeGateName(g.gate);
+
+      switch (gate) {
         case 'H':
           qasm += `h q[${g.qubitIndex}];\n`;
           break;
@@ -80,6 +96,12 @@ export const CircuitProvider = ({ children }) => {
         case 'T':
           qasm += `t q[${g.qubitIndex}];\n`;
           break;
+        case 'Tdg':
+          qasm += `tdg q[${g.qubitIndex}];\n`;
+          break;
+        case 'Sdg':
+          qasm += `sdg q[${g.qubitIndex}];\n`;
+          break;
         case 'RX':
           qasm += `rx(${g.params.angle || 0}) q[${g.qubitIndex}];\n`;
           break;
@@ -88,6 +110,12 @@ export const CircuitProvider = ({ children }) => {
           break;
         case 'RZ':
           qasm += `rz(${g.params.angle || 0}) q[${g.qubitIndex}];\n`;
+          break;
+        case 'P':
+          qasm += `p(${g.params.angle || 'pi/2'}) q[${g.qubitIndex}];\n`;
+          break;
+        case 'I':
+          qasm += `id q[${g.qubitIndex}];\n`;
           break;
         case 'CNOT':
           qasm += `cx q[${g.params.control}], q[${g.qubitIndex}];\n`;
@@ -101,7 +129,7 @@ export const CircuitProvider = ({ children }) => {
     });
 
     return qasm;
-  }, [circuit, qubits, classicalBits]);
+  }, [circuit, qubits, classicalBits, normalizeGateName]);
 
   // Add custom gate
   const addCustomGate = useCallback((name, gates) => {
