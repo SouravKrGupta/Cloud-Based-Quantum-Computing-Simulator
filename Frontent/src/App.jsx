@@ -20,16 +20,22 @@ import About from './pages/About';
 import Documentation from './pages/Documentation';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
+import ZXLab from './pages/ZXLab';
+import VoiceQuantumSimulator from './pages/VoiceQuantumSimulator';
 
-const ComposerLayoutRoutes = new Set(['/circuit-composer', '/quantum-composer']);
+const ComposerLayoutRoutes = new Set(['/circuit-composer']);
+const ZXLabLayoutRoutes = new Set(['/zx-lab']);
+const VoiceSimulatorLayoutRoutes = new Set(['/voice-quantum-simulator']);
 
 const AppShell = () => {
   const location = useLocation();
   const isComposerLayout = ComposerLayoutRoutes.has(location.pathname);
+  const isZXLabLayout = ZXLabLayoutRoutes.has(location.pathname);
+  const isVoiceSimulatorLayout = VoiceSimulatorLayoutRoutes.has(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isComposerLayout && <Navbar />}
+      {!isComposerLayout && !isZXLabLayout && !isVoiceSimulatorLayout && <Navbar />}
 
       <main className="grow">
         <Routes>
@@ -50,11 +56,13 @@ const AppShell = () => {
           <Route path="/reset-password/:uid/:token/" element={<ResetPassword />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/resend-otp" element={<ResendOTP />} />
-          <Route path="/quantum-composer" element={<CircuitComposer />} />
+
+          <Route path="/zx-lab" element={<ZXLab />} />
+          <Route path="/voice-quantum-simulator" element={<VoiceQuantumSimulator />} />
         </Routes>
       </main>
 
-      {!isComposerLayout && <Footer />}
+      {!isComposerLayout && !isZXLabLayout && !isVoiceSimulatorLayout && <Footer />}
     </div>
   );
 };

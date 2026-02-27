@@ -44,8 +44,8 @@ def redirect_after_auth(strategy, details, user=None, *args, **kwargs):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         
-        # Redirect to frontend home page with tokens
-        return redirect(f'http://localhost:5173/?access={access_token}&refresh={refresh_token}&user_id={user.id}')
+        # Redirect to frontend with tokens for automatic login
+        return redirect(f'http://localhost:5173/login?google_auth=success&access={access_token}&refresh={refresh_token}&user_id={user.id}')
 
 
 def complete_google_auth(strategy, details, user=None, *args, **kwargs):

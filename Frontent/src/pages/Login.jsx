@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
@@ -9,8 +9,32 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [googleAuthSuccess, setGoogleAuthSuccess] = useState(false);
   
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Check for Google auth parameters on mount
+  useEffect(() => {
+    const googleAuth = searchParams.get('google_auth');
+    const accessToken = searchParams.get('access');
+    const refreshToken = searchParams.get('refresh');
+    const userId = searchParams.get('user_id');
+
+    if (googleAuth === 'success' && accessToken && refreshToken && userId) {
+      // Save tokens and user data to localStorage
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify({ id: userId }));
+      
+      setGoogleAuthSuccess(true);
+      
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+    }
+  }, [searchParams, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -68,6 +92,38 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  // If Google auth is successful, show success message
+  if (googleAuthSuccess) {
+    return (
+      <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+          <div className="absolute top-1/4 right-1/3 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        </div>
+
+        <div className="relative z-10 max-w-md w-full space-y-8">
+          <div className="text-center">
+            <div className="mx-auto h-20 w-20 mb-4 flex items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-green-700 shadow-xl">
+              <svg className="h-12 w-12 text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" stroke="white" strokeWidth="2" fill="none" opacity="0.3"/>
+                <path d="M35 50 L45 60 L65 40" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h2 className="text-4xl font-extrabold text-white mb-2">
+              Google Authentication Success!
+            </h2>
+            <p className="text-green-300 mb-6">You have been successfully authenticated</p>
+            <div className="text-sm text-gray-300">
+              Redirecting to homepage...
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">

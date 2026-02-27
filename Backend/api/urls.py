@@ -18,6 +18,9 @@ from .views import (
     PublicQuantumCircuitsView
 )
 from .google_views import google_success_view
+from .voice_views import VoiceCommandView, TextToCircuitView
+from .code_views import PythonCodeGenerationView, QASMGenerationView
+from .zx_views import CircuitToZXGraphView, ZXGraphSimplificationView, ZXGraphToCircuitView
 
 urlpatterns = [
     path('', HealthCheckView.as_view(), name='health-check'),
@@ -39,4 +42,17 @@ urlpatterns = [
     path('circuits/<int:circuit_id>/public/', QuantumCircuitPublicView.as_view(), name='quantum-circuit-public'),
     path('circuits/public/', PublicQuantumCircuitsView.as_view(), name='public-quantum-circuits'),
     path('simulate/', QuantumCircuitSimulationView.as_view(), name='quantum-circuit-simulate'),
+    
+    # Voice and Text Command Endpoints
+    path('voice-command/', VoiceCommandView.as_view(), name='voice-command'),
+    path('text-to-circuit/', TextToCircuitView.as_view(), name='text-to-circuit'),
+    
+    # Code Generation Endpoints
+    path('generate-python/', PythonCodeGenerationView.as_view(), name='generate-python'),
+    path('generate-qasm/', QASMGenerationView.as_view(), name='generate-qasm'),
+    
+    # ZX-Calculus Endpoints
+    path('circuit-to-zx/', CircuitToZXGraphView.as_view(), name='circuit-to-zx'),
+    path('zx-simplify/', ZXGraphSimplificationView.as_view(), name='zx-simplify'),
+    path('zx-to-circuit/', ZXGraphToCircuitView.as_view(), name='zx-to-circuit'),
 ]
