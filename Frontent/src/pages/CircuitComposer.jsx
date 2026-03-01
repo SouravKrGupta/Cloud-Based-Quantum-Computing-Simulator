@@ -15,12 +15,28 @@ const CircuitComposer = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [showVoiceCommand, setShowVoiceCommand] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { execution, circuitName, setExecution, circuit } = useCircuit();
+  const { execution, circuitName, setExecution, circuit, clearCircuit, addGate, setQubits } = useCircuit();
 
-  const handleCircuitGenerated = async (circuit) => {
+  const handleCircuitGenerated = async (circuitConfig) => {
+    console.log('===== handleCircuitGenerated called =====');
+    console.log('Generated circuit config:', circuitConfig);
     setIsProcessing(false);
-    // Handle circuit generation from voice command
-    console.log('Generated circuit:', circuit);
+    
+    // Clear existing circuit
+    clearCircuit();
+    console.log('Circuit cleared');
+    
+    // Set number of qubits
+    setQubits(circuitConfig.qubits);
+    console.log('Qubits set to:', circuitConfig.qubits);
+    
+    // Add all gates
+    circuitConfig.gates.forEach((gate, index) => {
+      console.log(`Adding gate ${index + 1}:`, gate);
+      addGate(gate.time, gate.qubitIndex, gate.gate, gate.params);
+    });
+    
+    console.log('All gates added');
   };
 
   return (

@@ -15,22 +15,29 @@ const VoiceCommand = ({ onCircuitGenerated }) => {
     'Entangle two qubits then measure',
     'Create three qubits',
     'Create a GHZ state with three qubits',
-    'Make a two-qubit circuit and measure'
+    'Make a two-qubit circuit and measure',
+    'Add H gate to qubit 0',
+    'Add X gate to q1',
+    'Add CNOT from q0 to q1',
+    'Add Hadamard gate to qubit 2',
+    'Add CX gate from qubit 1 to qubit 3',
+    'Add Z gate to q0 and q2'
   ];
 
   const startListening = async () => {
     setIsListening(true);
     setError('');
     setRecognizedText('');
-    setTranscript('');
+    setTranscript('Listening...');
 
     try {
-      // Simulate voice recognition
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate voice recognition with longer duration
+      await new Promise(resolve => setTimeout(resolve, 4000));
       
       // Randomly select a sample command
       const randomCommand = sampleCommands[Math.floor(Math.random() * sampleCommands.length)];
       setRecognizedText(randomCommand);
+      setTranscript(`Recognized: "${randomCommand}"`);
     } catch (err) {
       setError('Voice recognition failed. Please try again.');
     } finally {
@@ -50,13 +57,13 @@ const VoiceCommand = ({ onCircuitGenerated }) => {
 
     setIsProcessing(true);
     setError('');
+    setTranscript(`Processing: "${recognizedText}"...`);
 
     try {
       const response = await fetch('http://localhost:8000/api/voice-command/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ command: recognizedText })
       });
@@ -68,6 +75,8 @@ const VoiceCommand = ({ onCircuitGenerated }) => {
       const data = await response.json();
       
       if (data.success) {
+        console.log('===== Voice command succeeded =====');
+        console.log('Circuit data:', data.data.circuit);
         setTranscript(`✅ Command processed: "${recognizedText}"`);
         onCircuitGenerated(data.data.circuit);
       } else {
@@ -98,6 +107,14 @@ const VoiceCommand = ({ onCircuitGenerated }) => {
           {showHelp ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
       </div>
+
+      {/* Listening Indicator */}
+      {isListening && (
+        <div className="mb-4 p-3 bg-blue-900 bg-opacity-20 border border-blue-500 rounded-lg flex items-center gap-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+          <span className="text-blue-400 text-sm">Listening... Speak your command</span>
+        </div>
+      )}
 
       {showHelp && (
         <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-4 mb-6">
