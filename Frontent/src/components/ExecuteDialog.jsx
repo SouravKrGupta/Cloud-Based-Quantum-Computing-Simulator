@@ -4,7 +4,6 @@ import { Play, StopCircle, Settings } from 'lucide-react';
 
 const ExecuteDialog = ({ onClose }) => {
   const { circuit, qubits, setExecution } = useCircuit();
-  const [backend, setBackend] = useState('simulator');
   const [shots, setShots] = useState(1000);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -34,7 +33,7 @@ const ExecuteDialog = ({ onClose }) => {
         body: JSON.stringify({
           qubits,
           gates: circuit,
-          backend,
+          backend: 'simulator', // Single backend
           shots,
         }),
       });
@@ -78,38 +77,6 @@ const ExecuteDialog = ({ onClose }) => {
           Run Circuit
         </h2>
 
-         {/* Backend Selection */}
-        <div className="mb-6">
-          <label className="text-white text-sm font-semibold block mb-3">
-            <Settings size={16} className="inline mr-2" />
-            Backend
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center gap-3 p-3 bg-slate-700 rounded cursor-pointer hover:bg-slate-600">
-              <input
-                type="radio"
-                name="backend"
-                value="simulator"
-                checked={backend === 'simulator'}
-                onChange={(e) => setBackend(e.target.value)}
-                className="w-4 h-4"
-              />
-              <span className="text-white text-sm">QuantumSim Cloud Simulator</span>
-            </label>
-            <label className="flex items-center gap-3 p-3 bg-slate-700 rounded cursor-pointer hover:bg-slate-600">
-              <input
-                type="radio"
-                name="backend"
-                value="quantumsim_cloud"
-                checked={backend === 'quantumsim_cloud'}
-                onChange={(e) => setBackend(e.target.value)}
-                className="w-4 h-4"
-              />
-              <span className="text-white text-sm">QuantumSim Cloud (Real QPU)</span>
-            </label>
-          </div>
-        </div>
-
         {/* Shots Configuration */}
         <div className="mb-6">
           <label className="text-white text-sm font-semibold block mb-3">
@@ -146,7 +113,8 @@ const ExecuteDialog = ({ onClose }) => {
            <div className="text-gray-300 text-xs space-y-1">
             <div>Gates: {circuit.length}</div>
             <div>Shots: {shots.toLocaleString()}</div>
-            <div>Backend: {backend === 'simulator' ? 'QuantumSim Cloud Simulator' : 'QuantumSim Cloud'}</div>
+            <div>Backend: QuantumSim Cloud Simulator</div>
+            <div>Operation: Drag and Drop Quantum Circuit</div>
           </div>
         </div>
 

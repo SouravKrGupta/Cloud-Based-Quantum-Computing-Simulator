@@ -16,6 +16,7 @@ const CircuitCanvas = () => {
   const [editingGate, setEditingGate] = useState(null);
   const [selectedGates, setSelectedGates] = useState(new Set());
   const [dragOverQubit, setDragOverQubit] = useState(null);
+  const [draggingGate, setDraggingGate] = useState(null);
   const gridRef = useRef(null);
 
   const handleDragOver = (e) => {
@@ -31,10 +32,35 @@ const CircuitCanvas = () => {
     setDragOverQubit(null);
   };
 
+  const handleDragStart = (gate) => {
+    setDraggingGate(gate);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingGate(null);
+    setDragOverQubit(null);
+  };
+
   const handleDrop = (e, qubitIndex) => {
     e.preventDefault();
     e.stopPropagation();
     setDragOverQubit(null);
+    
+    // If we're dragging an existing gate
+    if (draggingGate) {
+      const rect = gridRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const timeSlot = Math.max(0, Math.floor(x / 80)); // Assuming 80px per time slot
+      
+      // Update the gate's position
+      updateGate(draggingGate.id, {
+        qubitIndex: qubitIndex,
+        time: timeSlot
+      });
+      
+      setDraggingGate(null);
+      return;
+    }
     
     // Try to get data from GatePalette (application/json)
     let gateData = e.dataTransfer.getData('application/json');
@@ -195,7 +221,7 @@ const CircuitCanvas = () => {
                   ></div>
                 ))}
 
-                {/* Gate Blocks */}
+                 {/* Gate Blocks */}
                 {gatesByQubit[qubitIndex].map((gate) => (
                   <div
                     key={gate.id}
@@ -212,6 +238,9 @@ const CircuitCanvas = () => {
                       left: `calc(3rem + ${gate.time * 80}px)`,
                     }}
                     onClick={(e) => mode === 'edit' && handleGateClick(gate.id, e)}
+                    draggable={mode === 'edit'}
+                    onDragStart={() => handleDragStart(gate)}
+                    onDragEnd={handleDragEnd}
                   >
                     <div className="text-center text-white font-semibold text-xs">
                       {gate.gate}
