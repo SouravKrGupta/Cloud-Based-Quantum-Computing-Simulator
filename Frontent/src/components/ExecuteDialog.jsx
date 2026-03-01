@@ -65,20 +65,20 @@ const ExecuteDialog = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-8 shadow-lg max-w-md w-full mx-4">
+      <div className="bg-slate-800 rounded-lg p-8 shadow-lg max-w-md w-full mx-4">
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
           <Play size={24} />
           Run Circuit
         </h2>
 
-        {/* Backend Selection */}
+         {/* Backend Selection */}
         <div className="mb-6">
           <label className="text-white text-sm font-semibold block mb-3">
             <Settings size={16} className="inline mr-2" />
             Backend
           </label>
           <div className="space-y-2">
-            <label className="flex items-center gap-3 p-3 bg-gray-700 rounded cursor-pointer hover:bg-gray-600">
+            <label className="flex items-center gap-3 p-3 bg-slate-700 rounded cursor-pointer hover:bg-slate-600">
               <input
                 type="radio"
                 name="backend"
@@ -87,18 +87,18 @@ const ExecuteDialog = ({ onClose }) => {
                 onChange={(e) => setBackend(e.target.value)}
                 className="w-4 h-4"
               />
-              <span className="text-white text-sm">Quantum Simulator (Local)</span>
+              <span className="text-white text-sm">QuantumSim Cloud Simulator</span>
             </label>
-            <label className="flex items-center gap-3 p-3 bg-gray-700 rounded cursor-pointer hover:bg-gray-600">
+            <label className="flex items-center gap-3 p-3 bg-slate-700 rounded cursor-pointer hover:bg-slate-600">
               <input
                 type="radio"
                 name="backend"
-                value="ibm_quantum"
-                checked={backend === 'ibm_quantum'}
+                value="quantumsim_cloud"
+                checked={backend === 'quantumsim_cloud'}
                 onChange={(e) => setBackend(e.target.value)}
                 className="w-4 h-4"
               />
-              <span className="text-white text-sm">IBM Quantum (Real QPU)</span>
+              <span className="text-white text-sm">QuantumSim Cloud (Real QPU)</span>
             </label>
           </div>
         </div>
@@ -125,7 +125,7 @@ const ExecuteDialog = ({ onClose }) => {
               step="100"
               value={shots}
               onChange={(e) => setShots(Math.max(100, parseInt(e.target.value)))}
-              className="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+               className="w-20 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm"
             />
           </div>
           <span className="text-gray-400 text-xs mt-2">
@@ -134,12 +134,12 @@ const ExecuteDialog = ({ onClose }) => {
         </div>
 
         {/* Circuit Summary */}
-        <div className="mb-6 p-4 bg-gray-900 rounded border border-gray-700">
+           <div className="mb-6 p-4 bg-slate-900 rounded border border-slate-700">
           <h3 className="text-white font-semibold text-sm mb-2">Circuit Summary</h3>
-          <div className="text-gray-300 text-xs space-y-1">
+           <div className="text-gray-300 text-xs space-y-1">
             <div>Gates: {circuit.length}</div>
             <div>Shots: {shots.toLocaleString()}</div>
-            <div>Backend: {backend === 'simulator' ? 'Simulator' : 'IBM Quantum'}</div>
+            <div>Backend: {backend === 'simulator' ? 'QuantumSim Cloud Simulator' : 'QuantumSim Cloud'}</div>
           </div>
         </div>
 
@@ -148,14 +148,14 @@ const ExecuteDialog = ({ onClose }) => {
           <button
             onClick={onClose}
             disabled={isRunning}
-            className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-slate-700 text-white rounded hover:bg-slate-600 disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleRun}
             disabled={isRunning}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isRunning ? (
               <>

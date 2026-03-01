@@ -15,11 +15,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 text-white shadow-2xl backdrop-blur-md border-b border-white/10">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800 text-white shadow-2xl backdrop-blur-md border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="p-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 group-hover:shadow-lg group-hover:shadow-purple-500/50 transition-all">
+            <div className="p-2 rounded-lg bg-gradient-to-r from-indigo-600 to-cyan-600 group-hover:shadow-lg group-hover:shadow-indigo-500/50 transition-all">
               <svg className="h-6 w-6 text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.3"/>
                 <path d="M25 50 Q50 25 75 50 Q50 75 25 50" fill="currentColor" opacity="0.5"/>
@@ -27,7 +27,7 @@ const Navbar = () => {
                 <circle cx="65" cy="55" r="5" fill="currentColor"/>
               </svg>
             </div>
-            <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 hover:from-purple-300 hover:to-blue-300 transition-all">
+            <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 hover:from-indigo-300 hover:to-cyan-300 transition-all">
               QuantumSim
             </span>
           </Link>
@@ -54,7 +54,7 @@ const Navbar = () => {
                 </Link>
                 <Link 
                   to="/signup" 
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-purple-500/50 transition-all"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 shadow-lg hover:shadow-indigo-500/50 transition-all"
                 >
                   Sign Up
                 </Link>
@@ -70,9 +70,9 @@ const Navbar = () => {
                   </svg>
                   <span>{user?.name || 'Profile'}</span>
                 </Link>
-                <button 
+                 <button 
                   onClick={handleLogout} 
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 shadow-lg hover:shadow-red-500/50 transition-all"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 shadow-lg hover:shadow-red-500/50 transition-all"
                 >
                   Logout
                 </button>
@@ -93,9 +93,9 @@ const Navbar = () => {
                 >
                   Login
                 </Link>
-                <Link 
+                 <Link 
                   to="/signup" 
-                  className="block px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 transition-all"
+                  className="block px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-cyan-600 transition-all"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Sign Up
@@ -110,12 +110,12 @@ const Navbar = () => {
                 >
                   {user?.name || 'Profile'}
                 </Link>
-                <button 
+                 <button 
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }} 
-                  className="w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-red-600 to-pink-600 transition-all"
+                  className="w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-600 transition-all"
                 >
                   Logout
                 </button>

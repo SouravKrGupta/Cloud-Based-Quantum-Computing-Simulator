@@ -18,7 +18,7 @@ const Results = () => {
       id: 2,
       jobId: 'JOB-12346',
       circuitName: 'Superposition Test',
-      backend: 'IBM Quantum',
+      backend: 'QuantumSim Cloud',
       shots: 1024,
       date: '2024-02-10',
       status: 'COMPLETED',

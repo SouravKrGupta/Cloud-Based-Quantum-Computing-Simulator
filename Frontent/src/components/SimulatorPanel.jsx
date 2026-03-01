@@ -168,10 +168,10 @@ const SimulatorPanel = () => {
 
   const renderBarChart = (items, yLabel) => (
     <div className="h-full flex flex-col">
-      <div className="flex-1 border border-gray-700 rounded bg-gray-900 p-3">
-        <div className="relative h-full">
-          <div className="absolute left-8 top-2 bottom-8 border-l border-gray-700" />
-          <div className="absolute left-8 right-2 bottom-8 border-b border-gray-700" />
+      <div className="flex-1 border border-slate-700 rounded bg-slate-900 p-3">
+             <div className="relative h-full">
+            <div className="absolute left-8 top-2 bottom-8 border-l border-slate-700" />
+            <div className="absolute left-8 right-2 bottom-8 border-b border-slate-700" />
           <div className="absolute left-0 top-2 bottom-8 flex flex-col justify-between text-xs text-gray-500">
             <span>100</span>
             <span>80</span>
@@ -184,7 +184,7 @@ const SimulatorPanel = () => {
             {items.map((item) => (
               <div key={item.state} className="flex-1 min-w-[8px] flex items-end justify-center">
                 <div
-                  className="w-full bg-cyan-500"
+                  className="w-full bg-indigo-500"
                   style={{ height: `${Math.max(2, item.value * 100)}%` }}
                   title={`${item.state}: ${(item.value * 100).toFixed(2)}%`}
                 />
@@ -208,11 +208,11 @@ const SimulatorPanel = () => {
     const display = top.slice(0, 6);
     return (
       <div className="h-full flex flex-col">
-        <div className="flex-1 border border-gray-700 rounded bg-gray-900 p-3 relative overflow-hidden">
+        <div className="flex-1 border border-slate-700 rounded bg-slate-900 p-3 relative overflow-hidden">
           <div className="absolute inset-x-0 top-0 bottom-20 flex items-center justify-center">
-            <div className="relative w-56 h-56 rounded-full border border-gray-700 bg-gray-800">
-              <div className="absolute top-1/2 left-0 right-0 border-t border-gray-700" />
-              <div className="absolute top-[68%] left-[14%] right-[14%] h-10 border border-gray-700 rounded-full" />
+            <div className="relative w-56 h-56 rounded-full border border-slate-700 bg-slate-800">
+              <div className="absolute top-1/2 left-0 right-0 border-t border-slate-700" />
+              <div className="absolute top-[68%] left-[14%] right-[14%] h-10 border border-slate-700 rounded-full" />
               {display.map((item, idx) => {
                 const theta = (idx / Math.max(1, display.length)) * Math.PI * 2;
                 const r = 58 * (0.35 + item.probability);
@@ -266,13 +266,13 @@ const SimulatorPanel = () => {
     return renderBarChart(data, 'Probability (%)');
   };
 
-  const renderHeader = (view, onChange, options) => (
-    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-900">
+   const renderHeader = (view, onChange, options) => (
+    <div className="flex items-center justify-between px-3 py-2 border-b border-slate-700 bg-slate-900">
       <div className="relative">
         <select
           value={view}
           onChange={(e) => onChange(e.target.value)}
-          className="appearance-none bg-gray-800 border border-gray-700 rounded px-2 py-1 pr-7 text-lg text-gray-100"
+          className="appearance-none bg-slate-800 border border-slate-700 rounded px-2 py-1 pr-7 text-lg text-gray-100"
         >
           {options.map((option) => (
             <option key={option} value={option}>
@@ -294,8 +294,8 @@ const SimulatorPanel = () => {
   );
 
   return (
-    <section className={`bg-gray-950 border-t border-gray-700 transition-all ${showPanel ? 'h-[340px]' : 'h-12'}`}>
-      <div className="h-12 px-4 flex items-center justify-between bg-gray-900 border-b border-gray-700">
+    <section className={`bg-slate-950 border-t border-slate-700 transition-all ${showPanel ? 'h-[340px]' : 'h-12'}`}>
+      <div className="h-12 px-4 flex items-center justify-between bg-slate-900 border-b border-slate-700">
         <button onClick={() => setShowPanel((prev) => !prev)} className="text-sm text-gray-200 flex items-center gap-1">
           Visualizations
           <ChevronDown size={16} className={`${showPanel ? '' : '-rotate-90'} transition-transform`} />
@@ -303,9 +303,9 @@ const SimulatorPanel = () => {
         {showPanel && <span className="text-xs text-gray-500">Live from drag-drop operations</span>}
       </div>
 
-      {showPanel && (
+       {showPanel && (
         <div className="h-[288px] grid grid-cols-1 lg:grid-cols-2">
-          <div className="border-r border-gray-700 flex flex-col">
+          <div className="border-r border-slate-700 flex flex-col">
             {renderHeader(leftView, setLeftView, LEFT_PANEL_OPTIONS)}
             <div className="flex-1 p-2">{renderPanel(leftView)}</div>
           </div>

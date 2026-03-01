@@ -82,7 +82,7 @@ const Toolbar = ({ onRun }) => {
   };
 
   return (
-    <div className="bg-gray-900 text-white border-b border-gray-700 py-3 px-6">
+     <div className="bg-slate-900 text-white border-b border-slate-700 py-3 px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left section: File operations */}
         <div className="flex items-center gap-4">
@@ -94,8 +94,8 @@ const Toolbar = ({ onRun }) => {
               <Menu size={20} />
               File
             </button>
-            {showMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded shadow-lg z-50">
+             {showMenu && (
+              <div className="absolute top-full left-0 mt-1 bg-slate-800 border border-slate-700 rounded shadow-lg z-50">
                 <button
                   onClick={() => {
                     setShowSave(true);
@@ -177,11 +177,11 @@ const Toolbar = ({ onRun }) => {
             <RotateCw size={20} />
           </button>
 
-          <div className="flex items-center gap-1 border-l border-r border-gray-700 px-2">
+           <div className="flex items-center gap-1 border-l border-r border-slate-700 px-2">
             <button
               onClick={() => setAlignment('free')}
-              className={`p-2 rounded transition ${
-                alignment === 'free' ? 'bg-blue-600' : 'hover:bg-gray-800'
+               className={`p-2 rounded transition ${
+                alignment === 'free' ? 'bg-indigo-600' : 'hover:bg-slate-800'
               }`}
               title="Free alignment"
             >
@@ -189,8 +189,8 @@ const Toolbar = ({ onRun }) => {
             </button>
             <button
               onClick={() => setAlignment('left')}
-              className={`p-2 rounded transition flex items-center gap-1 ${
-                alignment === 'left' ? 'bg-blue-600' : 'hover:bg-gray-800'
+               className={`p-2 rounded transition flex items-center gap-1 ${
+                alignment === 'left' ? 'bg-indigo-600' : 'hover:bg-slate-800'
               }`}
               title="Left align"
             >
@@ -198,8 +198,8 @@ const Toolbar = ({ onRun }) => {
             </button>
             <button
               onClick={() => setAlignment('layers')}
-              className={`p-2 rounded transition flex items-center gap-1 ${
-                alignment === 'layers' ? 'bg-blue-600' : 'hover:bg-gray-800'
+               className={`p-2 rounded transition flex items-center gap-1 ${
+                alignment === 'layers' ? 'bg-indigo-600' : 'hover:bg-slate-800'
               }`}
               title="Layer alignment"
             >
@@ -207,12 +207,12 @@ const Toolbar = ({ onRun }) => {
             </button>
           </div>
 
-          <button
+           <button
             onClick={() =>
               setMode(mode === 'edit' ? 'inspect' : 'edit')
             }
             className={`p-2 rounded transition flex items-center gap-1 ${
-              mode === 'inspect' ? 'bg-green-600' : 'hover:bg-gray-800'
+              mode === 'inspect' ? 'bg-teal-600' : 'hover:bg-slate-800'
             }`}
             title="Toggle Inspect mode"
           >
@@ -230,9 +230,9 @@ const Toolbar = ({ onRun }) => {
           >
             <Code size={20} />
           </button>
-          <button
+           <button
             onClick={onRun}
-            className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-cyan-600 rounded hover:bg-cyan-700 transition flex items-center gap-2"
             title="Run Circuit"
           >
             <Play size={18} />

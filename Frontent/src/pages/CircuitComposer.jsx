@@ -52,30 +52,30 @@ const CircuitComposer = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-950 text-white">
+     <div className="flex flex-col h-screen bg-slate-950 text-white">
       <Toolbar onRun={() => setShowExecuteDialog(true)} />
 
-      <div className="flex flex-1 overflow-hidden gap-px bg-gray-800">
-        <div className="flex flex-col bg-gray-900 border-r border-gray-700">
+      <div className="flex flex-1 overflow-hidden gap-px bg-slate-800">
+        <div className="flex flex-col bg-slate-900 border-r border-slate-700">
           <GatePalette />
           
           {/* Voice Command Button */}
-          <div className="p-4 border-t border-gray-700">
+          <div className="p-4 border-t border-slate-700">
             <button
               onClick={() => setShowVoiceCommand((prev) => !prev)}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Mic size={20} />
               Voice Command
             </button>
           </div>
 
-          {/* ZX-Graph Conversion Button */}
-          <div className="p-4 border-t border-gray-700">
+           {/* ZX-Graph Conversion Button */}
+          <div className="p-4 border-t border-slate-700">
             <button
               onClick={convertToZXGraph}
               disabled={isProcessing}
-              className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-teal-600 to-green-700 hover:from-teal-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Layers size={20} />
               View ZX-Graph
@@ -83,9 +83,9 @@ const CircuitComposer = () => {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-auto bg-gray-900 border-b border-gray-700">
-            <div className="p-3 border-b border-gray-700 bg-gray-800 sticky top-0 flex justify-between items-center">
+         <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-auto bg-slate-900 border-b border-slate-700">
+            <div className="p-3 border-b border-slate-700 bg-slate-800 sticky top-0 flex justify-between items-center">
               <h2 className="text-lg font-semibold">{circuitName || 'Untitled Circuit'}</h2>
               <button
                 onClick={() => setShowHelp((prev) => !prev)}
@@ -104,12 +104,12 @@ const CircuitComposer = () => {
             )}
           </div>
 
-          <div className="border-t border-gray-700">
+           <div className="border-t border-slate-700">
             <SimulatorPanel />
           </div>
         </div>
 
-        <div className="flex flex-col bg-gray-900 border-l border-gray-700">
+        <div className="flex flex-col bg-slate-900 border-l border-slate-700">
           <CodePanel />
         </div>
       </div>
@@ -123,10 +123,10 @@ const CircuitComposer = () => {
         />
       )}
 
-      {showVoiceCommand && (
-        <div className="fixed bottom-6 right-6 w-96 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-6 z-50">
+       {showVoiceCommand && (
+        <div className="fixed bottom-6 right-6 w-96 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-6 z-50">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-purple-400">Voice Command</h4>
+            <h4 className="font-semibold text-indigo-400">Voice Command</h4>
             <button
               onClick={() => setShowVoiceCommand(false)}
               className="p-1 hover:bg-gray-700 rounded transition"
@@ -138,9 +138,9 @@ const CircuitComposer = () => {
         </div>
       )}
 
-      {showHelp && (
-        <div className="fixed bottom-6 right-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-4 max-w-xs z-50">
-          <h4 className="font-semibold mb-2 text-blue-400">Quick Tips</h4>
+       {showHelp && (
+        <div className="fixed bottom-6 right-6 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-4 max-w-xs z-50">
+          <h4 className="font-semibold mb-2 text-cyan-400">Quick Tips</h4>
           <ul className="text-sm text-gray-300 space-y-2">
             <li>- Drag gates from the left panel onto circuit wires</li>
             <li>- Click gates to select and edit parameters</li>

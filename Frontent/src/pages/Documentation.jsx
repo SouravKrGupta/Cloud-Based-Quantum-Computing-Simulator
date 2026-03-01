@@ -282,15 +282,10 @@ const Documentation = () => {
           <div className="bg-slate-800/60 rounded-2xl p-6 border border-slate-700">
             <h2 className="text-xl font-semibold text-purple-300 mb-4">Reference Resources</h2>
             <div className="grid md:grid-cols-3 gap-4">
-              <a
-                href="https://quantum.cloud.ibm.com/composer"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:border-blue-500 transition"
-              >
-                <p className="text-white font-semibold">IBM Quantum Composer</p>
-                <p className="text-gray-400 text-sm mt-1">Official UI inspiration and workflow.</p>
-              </a>
+              <div className="p-4 rounded-xl border border-slate-600 bg-slate-900/60">
+                <p className="text-white font-semibold">QuantumSim Composer</p>
+                <p className="text-gray-400 text-sm mt-1">Our innovative quantum circuit design interface.</p>
+              </div>
               <a
                 href="https://zxcalc.github.io/book/html/main_html.html"
                 target="_blank"

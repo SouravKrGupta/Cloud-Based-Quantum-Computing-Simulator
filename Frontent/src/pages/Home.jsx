@@ -8,22 +8,22 @@ const Home = () => {
   const footerCtaLabel = isLoggedIn ? 'Go to Profile' : 'Sign Up Free';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-32 pb-20 px-4">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
         </div>
         
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-sm rounded-full border border-purple-500/30 mb-8">
-            <span className="text-sm font-semibold text-purple-300">Quantum Computing Made Simple</span>
+          <div className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600/20 to-cyan-600/20 backdrop-blur-sm rounded-full border border-indigo-500/30 mb-8">
+            <span className="text-sm font-semibold text-indigo-300">Quantum Computing Made Simple</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
               QuantumSim
             </span>
           </h1>
@@ -33,10 +33,10 @@ const Home = () => {
             Design, test, and visualize quantum circuits with ease.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
             <Link 
               to="/circuit-composer" 
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
+              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-cyan-700 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-indigo-500/50"
             >
               Launch Quantum Composer
             </Link>
@@ -58,10 +58,10 @@ const Home = () => {
             <p className="text-gray-400 text-lg">Everything you need to explore quantum computing</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                 </svg>
@@ -70,9 +70,9 @@ const Home = () => {
               <p className="text-gray-400">Intuitive drag-and-drop interface for designing quantum circuits with real-time visualization.</p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+             {/* Feature 2 */}
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -81,9 +81,9 @@ const Home = () => {
               <p className="text-gray-400">Run quantum circuit simulations instantly with detailed results and probability distributions.</p>
             </div>
 
-            {/* Feature 3 */}
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+             {/* Feature 3 */}
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -92,9 +92,9 @@ const Home = () => {
               <p className="text-gray-400">Access your quantum experiments from anywhere with our secure cloud infrastructure.</p>
             </div>
 
-            {/* Feature 4 */}
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+             {/* Feature 4 */}
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                 </svg>
@@ -103,9 +103,9 @@ const Home = () => {
               <p className="text-gray-400">Visualize quantum states with interactive Bloch spheres and state vector diagrams.</p>
             </div>
 
-            {/* Feature 5 */}
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+             {/* Feature 5 */}
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -114,9 +114,9 @@ const Home = () => {
               <p className="text-gray-400">Your quantum experiments are encrypted and securely stored in the cloud.</p>
             </div>
 
-            {/* Feature 6 */}
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-purple-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 transform hover:-translate-y-2">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+             {/* Feature 6 */}
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/20 transform hover:-translate-y-2">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M12 15V5" />
                 </svg>
@@ -128,8 +128,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="px-4 py-20 bg-gradient-to-r from-purple-600 to-blue-600">
+       {/* Stats Section */}
+      <section className="px-4 py-20 bg-gradient-to-r from-indigo-600 to-cyan-600">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
@@ -157,10 +157,10 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Quantum Journey?</h2>
           <p className="text-xl text-gray-300 mb-10">Join thousands of quantum computing enthusiasts and start exploring today</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link 
               to="/circuit-composer" 
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
+              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-cyan-700 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-indigo-500/50"
             >
               Launch Quantum Composer
             </Link>
