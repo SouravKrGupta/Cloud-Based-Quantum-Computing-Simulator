@@ -300,7 +300,7 @@ const SimulatorPanel = () => {
           Visualizations
           <ChevronDown size={16} className={`${showPanel ? '' : '-rotate-90'} transition-transform`} />
         </button>
-        {showPanel && <span className="text-xs text-gray-500">Live from drag-drop operations</span>}
+        {showPanel && <span className="text-xs text-gray-500">Real-time visualization</span>}
       </div>
 
        {showPanel && (

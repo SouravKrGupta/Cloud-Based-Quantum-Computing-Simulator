@@ -74,12 +74,17 @@ const Visualizations = () => {
     let state = new Array(size).fill(null).map(() => c(0, 0));
     state[0] = c(1, 0);
 
+    console.log("Initial state:", state);
+
     const sorted = [...circuit].sort((a, b) => a.time - b.time);
+    console.log("Sorted circuit:", sorted);
 
     for (const gateOp of sorted) {
       const gate = (gateOp.gate || '').toUpperCase();
       const q = Math.max(0, Math.min(n - 1, Number(gateOp.qubitIndex ?? 0)));
       const angle = parseAngle(gateOp?.params?.angle, 0);
+
+      console.log(`Applying ${gate} gate to qubit ${q}`);
 
       switch (gate) {
         case 'H': {
@@ -140,75 +145,83 @@ const Visualizations = () => {
           break;
         }
         default:
+          console.log(`Unknown gate: ${gate}`);
           break;
       }
+
+      console.log("State after gate:", state);
     }
 
     const probs = state.map(abs2);
     const norm = probs.reduce((s, v) => s + v, 0) || 1;
+    console.log("Total probability before normalization:", norm);
     const normalized = state.map((amp) => scale(amp, 1 / Math.sqrt(norm)));
+    
+    const finalProbs = normalized.map(abs2);
+    console.log("Final probabilities:", finalProbs);
+    console.log("Total probability after normalization:", finalProbs.reduce((s, v) => s + v, 0));
+
     return { n, statevector: normalized };
   };
 
+  // Debug circuit data
+  console.log("=== Visualization Debug Info ===");
+  console.log("Circuit data:", circuit);
+  console.log("Number of qubits:", qubits);
+  
+  // Check if circuit is valid
+  if (!circuit || circuit.length === 0 || !qubits || qubits === 0) {
+    console.log("No valid circuit data");
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-slate-900 text-white">
+        <h2 className="text-xl font-semibold mb-4">No Circuit Data</h2>
+        <p className="text-slate-400">Please create a circuit in the composer to see visualizations.</p>
+      </div>
+    );
+  }
+  
   // Calculate simulation results
   const sim = simulateStatevector(circuit, qubits);
+  console.log("Simulation results:", sim);
+  
   const states = sim.statevector.map((amp, i) => ({
     state: i.toString(2).padStart(sim.n, '0'),
     amplitude: Math.sqrt(abs2(amp)),
     probability: abs2(amp),
     phase: Math.atan2(amp.im, amp.re),
   }));
+  
+  // Debug states
+  console.log("States generated:", states);
 
   const topStates = [...states].sort((a, b) => b.probability - a.probability);
 
   // Render Probability Bar Chart
   const renderProbabilityChart = () => {
+    console.log("Rendering probability chart");
     const data = states.slice(0, 16).map((s) => ({ state: s.state, value: s.probability }));
+    
+    console.log("Probability chart data:", data);
     
     return (
       <div className="h-full flex flex-col">
         <div className="flex-1 border border-slate-700 rounded bg-slate-900 p-6">
-          <div className="relative h-full">
-            {/* Y-axis */}
-            <div className="absolute left-8 top-2 bottom-8 border-l border-slate-700" />
-            {/* X-axis */}
-            <div className="absolute left-8 right-2 bottom-8 border-b border-slate-700" />
-            
-            {/* Y-axis labels */}
-            <div className="absolute left-0 top-2 bottom-8 flex flex-col justify-between text-xs text-gray-500">
-              <span>100%</span>
-              <span>80%</span>
-              <span>60%</span>
-              <span>40%</span>
-              <span>20%</span>
-              <span>0%</span>
-            </div>
-            
-            {/* Bars */}
-            <div className="absolute left-10 right-2 bottom-10 top-3 flex items-end gap-1">
+          <div className="h-64">
+            <h3 className="text-lg font-semibold text-cyan-400 mb-4">Probability Distribution</h3>
+            <div className="space-y-2 h-48">
               {data.map((item) => (
-                <div key={item.state} className="flex-1 min-w-[12px] flex items-end justify-center">
-                  <div
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 transition-colors cursor-pointer"
-                    style={{ height: `${Math.max(2, item.value * 100)}%` }}
-                    title={`|${item.state}>: ${(item.value * 100).toFixed(2)}%`}
-                  />
+                <div key={item.state} className="flex items-center gap-3">
+                  <span className="w-12 text-xs text-gray-400">{item.state}</span>
+                  <div className="flex-1 h-8 bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-cyan-500 transition-all duration-300"
+                      style={{ width: `${item.value * 100}%` }}
+                      title={`|${item.state}>: ${(item.value * 100).toFixed(2)}%`}
+                    />
+                  </div>
+                  <span className="w-16 text-xs text-gray-300">{(item.value * 100).toFixed(1)}%</span>
                 </div>
               ))}
-            </div>
-            
-            {/* X-axis labels */}
-            <div className="absolute left-10 right-2 bottom-0 flex gap-1">
-              {data.map((item) => (
-                <span key={`label-${item.state}`} className="flex-1 text-[10px] text-gray-500 rotate-[-65deg] origin-top-left">
-                  |{item.state}⟩
-                </span>
-              ))}
-            </div>
-            
-            {/* Y-axis title */}
-            <div className="absolute -left-4 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-gray-500">
-              Probability
             </div>
           </div>
         </div>
@@ -233,6 +246,8 @@ const Visualizations = () => {
   // Render Q-Sphere
   const renderQSphere = () => {
     const displayStates = topStates.slice(0, 12);
+    
+    console.log("Q-sphere data:", displayStates);
     
     return (
       <div className="h-full flex flex-col">
@@ -298,52 +313,30 @@ const Visualizations = () => {
 
   // Render Statevector Bar Chart
   const renderStatevectorChart = () => {
+    console.log("Rendering statevector chart");
     const data = states.slice(0, 16).map((s) => ({ state: s.state, value: s.amplitude }));
+    
+    console.log("Statevector chart data:", data);
     
     return (
       <div className="h-full flex flex-col">
         <div className="flex-1 border border-slate-700 rounded bg-slate-900 p-6">
-          <div className="relative h-full">
-            {/* Y-axis */}
-            <div className="absolute left-8 top-2 bottom-8 border-l border-slate-700" />
-            {/* X-axis */}
-            <div className="absolute left-8 right-2 bottom-8 border-b border-slate-700" />
-            
-            {/* Y-axis labels */}
-            <div className="absolute left-0 top-2 bottom-8 flex flex-col justify-between text-xs text-gray-500">
-              <span>1.0</span>
-              <span>0.8</span>
-              <span>0.6</span>
-              <span>0.4</span>
-              <span>0.2</span>
-              <span>0.0</span>
-            </div>
-            
-            {/* Bars */}
-            <div className="absolute left-10 right-2 bottom-10 top-3 flex items-end gap-1">
+          <div className="h-64">
+            <h3 className="text-lg font-semibold text-purple-400 mb-4">Statevector Amplitude</h3>
+            <div className="space-y-2 h-48">
               {data.map((item) => (
-                <div key={item.state} className="flex-1 min-w-[12px] flex items-end justify-center">
-                  <div
-                    className="w-full bg-purple-500 hover:bg-purple-400 transition-colors cursor-pointer"
-                    style={{ height: `${Math.max(2, item.value * 100)}%` }}
-                    title={`|${item.state}>: ${item.value.toFixed(3)}`}
-                  />
+                <div key={item.state} className="flex items-center gap-3">
+                  <span className="w-12 text-xs text-gray-400">{item.state}</span>
+                  <div className="flex-1 h-8 bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-purple-500 transition-all duration-300"
+                      style={{ width: `${item.value * 100}%` }}
+                      title={`|${item.state}>: ${item.value.toFixed(3)}`}
+                    />
+                  </div>
+                  <span className="w-16 text-xs text-gray-300">{item.value.toFixed(3)}</span>
                 </div>
               ))}
-            </div>
-            
-            {/* X-axis labels */}
-            <div className="absolute left-10 right-2 bottom-0 flex gap-1">
-              {data.map((item) => (
-                <span key={`label-${item.state}`} className="flex-1 text-[10px] text-gray-500 rotate-[-65deg] origin-top-left">
-                  |{item.state}⟩
-                </span>
-              ))}
-            </div>
-            
-            {/* Y-axis title */}
-            <div className="absolute -left-4 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-gray-500">
-              Amplitude
             </div>
           </div>
         </div>
@@ -367,13 +360,20 @@ const Visualizations = () => {
 
   // Render active view
   const renderActiveView = () => {
+    console.log("Active view:", activeView);
     switch (activeView) {
       case 'probabilities':
-        return renderProbabilityChart();
+        const probChart = renderProbabilityChart();
+        console.log("Probability chart returned:", probChart);
+        return probChart;
       case 'qsphere':
-        return renderQSphere();
+        const qsphereChart = renderQSphere();
+        console.log("Q-sphere chart returned:", qsphereChart);
+        return qsphereChart;
       case 'statevector':
-        return renderStatevectorChart();
+        const statevectorChart = renderStatevectorChart();
+        console.log("Statevector chart returned:", statevectorChart);
+        return statevectorChart;
       default:
         return renderProbabilityChart();
     }
@@ -440,7 +440,7 @@ const Visualizations = () => {
             </div>
           </div>
           <div className="text-sm text-gray-400">
-            Live from drag-drop operations • {circuit.length} gates
+            Visualizing {circuit.length} gates • {qubits} qubits
           </div>
         </div>
       </div>
@@ -571,7 +571,7 @@ const Visualizations = () => {
             </div>
 
             {/* Visualization Content */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-6 " style={{ minHeight: '600px' }}>
               {renderActiveView()}
             </div>
           </div>
