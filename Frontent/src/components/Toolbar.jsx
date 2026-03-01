@@ -21,11 +21,15 @@ const Toolbar = ({ onRun }) => {
     mode,
     setMode,
     alignment,
-    setAlignment,
+    alignGates,
     generateOpenQASM,
     circuitName,
     setCircuitName,
     saveCircuit,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   } = useCircuit();
 
   const [showMenu, setShowMenu] = useState(false);
@@ -33,12 +37,12 @@ const Toolbar = ({ onRun }) => {
 
   const handleUndo = () => {
     console.log('Undo clicked');
-    // Implement undo logic
+    undo();
   };
 
   const handleRedo = () => {
     console.log('Redo clicked');
-    // Implement redo logic
+    redo();
   };
 
   const handleSaveCircuit = () => {
@@ -164,48 +168,50 @@ const Toolbar = ({ onRun }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleUndo}
-            className="p-2 rounded hover:bg-gray-800 transition"
+            disabled={!canUndo}
+            className="p-2 rounded hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
             title="Undo"
           >
             <RotateCcw size={20} />
           </button>
           <button
             onClick={handleRedo}
-            className="p-2 rounded hover:bg-gray-800 transition"
+            disabled={!canRedo}
+            className="p-2 rounded hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
             title="Redo"
           >
             <RotateCw size={20} />
           </button>
 
-           <div className="flex items-center gap-1 border-l border-r border-slate-700 px-2">
-            <button
-              onClick={() => setAlignment('free')}
-               className={`p-2 rounded transition ${
-                alignment === 'free' ? 'bg-indigo-600' : 'hover:bg-slate-800'
-              }`}
-              title="Free alignment"
-            >
-              Free
-            </button>
-            <button
-              onClick={() => setAlignment('left')}
-               className={`p-2 rounded transition flex items-center gap-1 ${
-                alignment === 'left' ? 'bg-indigo-600' : 'hover:bg-slate-800'
-              }`}
-              title="Left align"
-            >
-              <AlignLeft size={16} /> Left
-            </button>
-            <button
-              onClick={() => setAlignment('layers')}
-               className={`p-2 rounded transition flex items-center gap-1 ${
-                alignment === 'layers' ? 'bg-indigo-600' : 'hover:bg-slate-800'
-              }`}
-              title="Layer alignment"
-            >
-              <Layers size={16} /> Layers
-            </button>
-          </div>
+            <div className="flex items-center gap-1 border-l border-r border-slate-700 px-2">
+             <button
+               onClick={() => alignGates('free')}
+                className={`p-2 rounded transition ${
+                 alignment === 'free' ? 'bg-indigo-600' : 'hover:bg-slate-800'
+               }`}
+               title="Free alignment (gates can be placed anywhere)"
+             >
+               Free
+             </button>
+             <button
+               onClick={() => alignGates('left')}
+                className={`p-2 rounded transition flex items-center gap-1 ${
+                 alignment === 'left' ? 'bg-indigo-600' : 'hover:bg-slate-800'
+               }`}
+               title="Left align (all gates at time=0)"
+             >
+               <AlignLeft size={16} /> Left
+             </button>
+             <button
+               onClick={() => alignGates('layers')}
+                className={`p-2 rounded transition flex items-center gap-1 ${
+                 alignment === 'layers' ? 'bg-indigo-600' : 'hover:bg-slate-800'
+               }`}
+               title="Layer alignment (gates stacked in time slots)"
+             >
+               <Layers size={16} /> Layers
+             </button>
+           </div>
 
            <button
             onClick={() =>
@@ -214,22 +220,15 @@ const Toolbar = ({ onRun }) => {
             className={`p-2 rounded transition flex items-center gap-1 ${
               mode === 'inspect' ? 'bg-teal-600' : 'hover:bg-slate-800'
             }`}
-            title="Toggle Inspect mode"
+            title={mode === 'inspect' ? 'Switch to Edit mode' : 'Switch to Inspect mode'}
           >
             <Eye size={20} />
             {mode === 'inspect' ? 'Inspect' : 'Edit'}
           </button>
         </div>
 
-        {/* Right section: View & Execute */}
+        {/* Right section: Execute */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/code-view')}
-            className="p-2 rounded hover:bg-gray-800 transition flex items-center gap-1"
-            title="View Code"
-          >
-            <Code size={20} />
-          </button>
            <button
             onClick={onRun}
             className="px-4 py-2 bg-cyan-600 rounded hover:bg-cyan-700 transition flex items-center gap-2"

@@ -14,6 +14,13 @@ const ExecuteDialog = ({ onClose }) => {
       return;
     }
 
+    // Check if user is logged in
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Please login to run quantum circuit simulations.');
+      return;
+    }
+
     setIsRunning(true);
 
     try {

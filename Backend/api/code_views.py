@@ -92,6 +92,10 @@ from qiskit import QuantumCircuit, Aer, execute
                     code += f"qc.s({qubit_index})\n"
                 elif gate_type == 'T':
                     code += f"qc.t({qubit_index})\n"
+                elif gate_type == 'Tdg':
+                    code += f"qc.tdg({qubit_index})\n"
+                elif gate_type == 'Sdg':
+                    code += f"qc.sdg({qubit_index})\n"
                 elif gate_type == 'RX':
                     angle = params.get('angle', 0)
                     code += f"qc.rx({angle}, {qubit_index})\n"
@@ -110,9 +114,14 @@ from qiskit import QuantumCircuit, Aer, execute
                 elif gate_type == 'CZ':
                     target = params.get('target', 1)
                     code += f"qc.cz({qubit_index}, {target})\n"
+                elif gate_type == 'SWAP':
+                    target = params.get('target', 1)
+                    code += f"qc.swap({qubit_index}, {target})\n"
                 elif gate_type == 'Measure':
                     classical_bit = params.get('classicalBit', qubit_index)
                     code += f"qc.measure({qubit_index}, {classical_bit})\n"
+                elif gate_type == 'I':
+                    code += f"qc.id({qubit_index})\n"
 
             code += "\n"
 
@@ -233,6 +242,10 @@ include "qelib1.inc";
                     qasm += f"s q[{qubit_index}];\n"
                 elif gate_type == 'T':
                     qasm += f"t q[{qubit_index}];\n"
+                elif gate_type == 'Tdg':
+                    qasm += f"tdg q[{qubit_index}];\n"
+                elif gate_type == 'Sdg':
+                    qasm += f"sdg q[{qubit_index}];\n"
                 elif gate_type == 'RX':
                     angle = params.get('angle', 0)
                     qasm += f"rx({angle}) q[{qubit_index}];\n"
@@ -251,9 +264,14 @@ include "qelib1.inc";
                 elif gate_type == 'CZ':
                     target = params.get('target', 1)
                     qasm += f"cz q[{qubit_index}], q[{target}];\n"
+                elif gate_type == 'SWAP':
+                    target = params.get('target', 1)
+                    qasm += f"swap q[{qubit_index}], q[{target}];\n"
                 elif gate_type == 'Measure':
                     classical_bit = params.get('classicalBit', qubit_index)
                     qasm += f"measure q[{qubit_index}] -> c[{classical_bit}];\n"
+                elif gate_type == 'I':
+                    qasm += f"id q[{qubit_index}];\n"
 
             qasm += "\n"
 

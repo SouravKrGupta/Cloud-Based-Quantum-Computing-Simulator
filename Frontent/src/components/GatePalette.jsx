@@ -84,7 +84,7 @@ const GatePalette = () => {
   return (
     <aside className="w-80 bg-gray-900 border-r border-gray-700 h-full overflow-y-auto">
       <div className="p-4 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
-        <h3 className="text-white text-2xl font-semibold mb-3">Operations</h3>
+        
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
           <input

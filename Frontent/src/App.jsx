@@ -22,8 +22,10 @@ import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import ZXLab from './pages/ZXLab';
 import VoiceQuantumSimulator from './pages/VoiceQuantumSimulator';
+import Visualizations from './pages/Visualizations';
+import ZXGraph from './pages/ZXGraph';
 
-const ComposerLayoutRoutes = new Set(['/circuit-composer']);
+const ComposerLayoutRoutes = new Set(['/circuit-composer', '/visualizations', '/code-view', '/zx-graph']);
 const ZXLabLayoutRoutes = new Set(['/zx-lab']);
 const VoiceSimulatorLayoutRoutes = new Set(['/voice-quantum-simulator']);
 
@@ -59,6 +61,9 @@ const AppShell = () => {
 
           <Route path="/zx-lab" element={<ZXLab />} />
           <Route path="/voice-quantum-simulator" element={<VoiceQuantumSimulator />} />
+          <Route path="/visualizations" element={<Visualizations />} />
+          <Route path="/code-view" element={<CodeView />} />
+          <Route path="/zx-graph" element={<ZXGraph />} />
         </Routes>
       </main>
 

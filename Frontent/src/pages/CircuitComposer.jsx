@@ -1,24 +1,21 @@
 import React, { useState } from 'react';
-import { HelpCircle, Mic, Layers } from 'lucide-react';
+import { HelpCircle, Mic, Layers, Eye, Code } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCircuit } from '../context/CircuitContext';
 import Toolbar from '../components/Toolbar';
 import GatePalette from '../components/GatePalette';
 import CircuitCanvas from '../components/CircuitCanvas';
-import SimulatorPanel from '../components/SimulatorPanel';
 import ExecuteDialog from '../components/ExecuteDialog';
 import ResultsView from '../components/ResultsView';
-import CodePanel from '../components/CodePanel';
 import VoiceCommand from '../components/VoiceCommand';
-import ZXGraphCanvas from '../components/ZXGraphCanvas';
 
 const CircuitComposer = () => {
+  const navigate = useNavigate();
   const [showExecuteDialog, setShowExecuteDialog] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showVoiceCommand, setShowVoiceCommand] = useState(false);
-  const [showZXGraph, setShowZXGraph] = useState(false);
-  const [zxGraph, setZxGraph] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { execution, circuitName, setExecution } = useCircuit();
+  const { execution, circuitName, setExecution, circuit } = useCircuit();
 
   const handleCircuitGenerated = async (circuit) => {
     setIsProcessing(false);
@@ -26,91 +23,80 @@ const CircuitComposer = () => {
     console.log('Generated circuit:', circuit);
   };
 
-  const convertToZXGraph = async () => {
-    setIsProcessing(true);
-    // This would connect to the backend API to convert circuit to ZX-graph
-    // For now, we'll simulate it
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setZxGraph({
-      nodes: [
-        { id: 1, x: 100, y: 100, type: 'z', phase: '0', label: 'Z', color: '#3B82F6' },
-        { id: 2, x: 200, y: 150, type: 'x', phase: 'π/2', label: 'X', color: '#EF4444' },
-        { id: 3, x: 300, y: 100, type: 'z', phase: 'π', label: 'Z', color: '#3B82F6' },
-        { id: 4, x: 400, y: 150, type: 'x', phase: 'π/4', label: 'X', color: '#EF4444' },
-        { id: 5, x: 500, y: 100, type: 'z', phase: '3π/2', label: 'Z', color: '#3B82F6' },
-      ],
-      edges: [
-        { source: 1, target: 2 },
-        { source: 2, target: 3 },
-        { source: 3, target: 4 },
-        { source: 4, target: 5 },
-        { source: 2, target: 4 },
-      ]
-    });
-    setIsProcessing(false);
-    setShowZXGraph(true);
-  };
-
   return (
-     <div className="flex flex-col h-screen bg-slate-950 text-white">
+    <div className="flex flex-col h-screen bg-slate-950 text-white">
       <Toolbar onRun={() => setShowExecuteDialog(true)} />
 
       <div className="flex flex-1 overflow-hidden gap-px bg-slate-800">
-        <div className="flex flex-col bg-slate-900 border-r border-slate-700">
-          <GatePalette />
-          
-          {/* Voice Command Button */}
-          <div className="p-4 border-t border-slate-700">
-            <button
-              onClick={() => setShowVoiceCommand((prev) => !prev)}
-              className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <Mic size={20} />
-              Voice Command
-            </button>
+        {/* Operations Section */}
+        <div className="flex flex-col bg-slate-900 border-r border-slate-700 w-80">
+          <div className="p-3 border-b border-slate-700 bg-slate-800">
+            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Operations</h3>
           </div>
-
-           {/* ZX-Graph Conversion Button */}
-          <div className="p-4 border-t border-slate-700">
-            <button
-              onClick={convertToZXGraph}
-              disabled={isProcessing}
-              className="w-full bg-gradient-to-r from-teal-600 to-green-700 hover:from-teal-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <Layers size={20} />
-              View ZX-Graph
-            </button>
+          <div className="flex-1 ">
+            <GatePalette />
           </div>
         </div>
 
-         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-auto bg-slate-900 border-b border-slate-700">
+        {/* Quantum Circuit Section */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-auto bg-slate-900">
             <div className="p-3 border-b border-slate-700 bg-slate-800 sticky top-0 flex justify-between items-center">
               <h2 className="text-lg font-semibold">{circuitName || 'Untitled Circuit'}</h2>
               <button
                 onClick={() => setShowHelp((prev) => !prev)}
-                className="p-2 hover:bg-gray-700 rounded transition"
+                className="p-2 hover:bg-slate-700 rounded transition"
                 title="Help"
               >
-                <HelpCircle size={18} className="text-gray-300 hover:text-blue-400" />
+                <HelpCircle size={18} className="text-gray-300 hover:text-cyan-400" />
               </button>
             </div>
             
             {/* Main Canvas */}
-            {showZXGraph ? (
-              <ZXGraphCanvas zxGraph={zxGraph} />
-            ) : (
-              <CircuitCanvas />
-            )}
-          </div>
-
-           <div className="border-t border-slate-700">
-            <SimulatorPanel />
+            <CircuitCanvas />
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col bg-slate-900 border-l border-slate-700">
-          <CodePanel />
+      {/* Bottom Action Bar */}
+      <div className="bg-slate-900 border-t border-slate-700 px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowVoiceCommand((prev) => !prev)}
+              className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Mic size={18} />
+              Voice Command
+            </button>
+
+            <button
+              onClick={() => navigate('/visualizations')}
+              disabled={circuit.length === 0}
+              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Eye size={18} />
+              Visualizations
+            </button>
+
+            <button
+              onClick={() => navigate('/code-view')}
+              disabled={circuit.length === 0}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Code size={18} />
+              View Code
+            </button>
+
+            <button
+              onClick={() => navigate('/zx-graph')}
+              disabled={circuit.length === 0 || isProcessing}
+              className="bg-gradient-to-r from-teal-600 to-green-700 hover:from-teal-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <Layers size={18} />
+              View ZX-Graph
+            </button>
+          </div>
         </div>
       </div>
 
@@ -138,21 +124,23 @@ const CircuitComposer = () => {
         </div>
       )}
 
-       {showHelp && (
+      {showHelp && (
         <div className="fixed bottom-6 right-6 bg-slate-800 border border-slate-700 rounded-lg shadow-lg p-4 max-w-xs z-50">
           <h4 className="font-semibold mb-2 text-cyan-400">Quick Tips</h4>
           <ul className="text-sm text-gray-300 space-y-2">
-            <li>- Drag gates from the left panel onto circuit wires</li>
+            <li>- Drag gates from the Operations panel onto circuit wires</li>
             <li>- Click gates to select and edit parameters</li>
             <li>- Use Ctrl+Click to select multiple gates</li>
             <li>- Press Delete to remove selected gates</li>
             <li>- Click Run to execute circuit</li>
             <li>- Use Voice Command for hands-free circuit creation</li>
-            <li>- View ZX-Graph to see quantum circuit representation</li>
+            <li>- Click Visualizations to see quantum state representations</li>
+            <li>- Click View Code to see OpenQASM representation</li>
+            <li>- Click ZX-Graph to see quantum circuit representation</li>
           </ul>
           <button
             onClick={() => setShowHelp(false)}
-            className="mt-4 w-full px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm transition"
+            className="mt-4 w-full px-3 py-1 bg-cyan-600 hover:bg-cyan-700 rounded text-sm transition"
           >
             Got it
           </button>

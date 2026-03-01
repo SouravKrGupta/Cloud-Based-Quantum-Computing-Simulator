@@ -11,6 +11,7 @@ const CircuitCanvas = () => {
     removeGate,
     updateGate,
     setQubits,
+    mode,
   } = useCircuit();
   const [editingGate, setEditingGate] = useState(null);
   const [selectedGates, setSelectedGates] = useState(new Set());
@@ -122,10 +123,10 @@ const CircuitCanvas = () => {
   const maxTime = circuit.length > 0 ? Math.max(...circuit.map((g) => g.time)) : 0;
 
   return (
-    <section className="flex-1 bg-gray-900 overflow-auto flex flex-col">
+    <section className="flex-1 bg-slate-900 overflow-auto flex flex-col">
       <div className="flex-1 flex flex-col p-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+        <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-700">
           <div>
             <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Quantum Circuit</h3>
           </div>
@@ -133,12 +134,12 @@ const CircuitCanvas = () => {
             <label className="text-gray-400 text-sm flex items-center gap-2">
               <span>Qubits:</span>
               <input
-                type="number"
+                 type="number"
                 min="1"
                 max="20"
                 value={qubits}
                 onChange={(e) => setQubits(Math.max(1, parseInt(e.target.value)))}
-                className="w-12 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:border-blue-400 focus:outline-none"
+                className="w-12 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:border-cyan-400 focus:outline-none"
               />
             </label>
             {selectedGates.size > 0 && (
@@ -149,45 +150,47 @@ const CircuitCanvas = () => {
           </div>
         </div>
 
-        {/* Circuit Grid */}
+         {/* Circuit Grid */}
         <div
           ref={gridRef}
-          className="flex-1 border border-gray-700 rounded-lg bg-gray-800 overflow-x-auto"
+          className="flex-1 border border-slate-700 rounded-lg bg-slate-800 overflow-x-auto"
         >
           <div className="inline-block min-w-full">
             {/* Qubit Lines */}
             {Array.from({ length: qubits }).map((_, qubitIndex) => (
               <div
                 key={`qubit-${qubitIndex}`}
-                onDragOver={handleDragOver}
-                onDragEnter={() => handleDragEnter(qubitIndex)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, qubitIndex)}
-                className={`border-b border-gray-700 h-20 relative transition-colors ${
+                onDragOver={mode === 'edit' ? handleDragOver : undefined}
+                onDragEnter={mode === 'edit' ? () => handleDragEnter(qubitIndex) : undefined}
+                onDragLeave={mode === 'edit' ? handleDragLeave : undefined}
+                onDrop={mode === 'edit' ? (e) => handleDrop(e, qubitIndex) : undefined}
+                className={`border-b border-slate-700 h-20 relative transition-colors ${
+                  mode === 'inspect' ? 'pointer-events-none' : ''
+                } ${
                   dragOverQubit === qubitIndex 
-                    ? 'bg-blue-900 bg-opacity-30 border-blue-500' 
-                    : 'bg-gray-800 hover:bg-gray-700'
+                    ? 'bg-cyan-900 bg-opacity-30 border-cyan-500' 
+                    : 'bg-slate-800 hover:bg-slate-700'
                 }`}
               >
-                {/* Qubit label */}
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gray-900 border-r border-gray-700 flex items-center justify-center">
+                 {/* Qubit label */}
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-slate-900 border-r border-slate-700 flex items-center justify-center">
                   <span className="text-white font-semibold text-sm">
                     q{qubitIndex}
                   </span>
                 </div>
 
-                {/* Qubit wire */}
+                 {/* Qubit wire */}
                 <div className={`absolute left-12 right-0 top-1/2 h-0.5 opacity-50 ${
                   dragOverQubit === qubitIndex 
-                    ? 'bg-gradient-to-r from-blue-400 via-blue-400 to-transparent' 
-                    : 'bg-gradient-to-r from-blue-500 to-transparent'
+                    ? 'bg-gradient-to-r from-cyan-400 via-cyan-400 to-transparent' 
+                    : 'bg-gradient-to-r from-cyan-500 to-transparent'
                 }`}></div>
 
                 {/* Time slots */}
                 {Array.from({ length: maxTime + 5 }).map((_, timeIndex) => (
                   <div
                     key={`slot-${qubitIndex}-${timeIndex}`}
-                    className="absolute top-0 bottom-0 w-20 border-r border-gray-700"
+                    className="absolute top-0 bottom-0 w-20 border-r border-slate-700"
                     style={{ left: `calc(3rem + ${timeIndex * 80}px)` }}
                   ></div>
                 ))}
@@ -204,11 +207,11 @@ const CircuitCanvas = () => {
                         : 'bg-blue-600 hover:bg-blue-700'
                     } rounded border border-gray-300 flex items-center justify-center cursor-move transition ${
                       selectedGates.has(gate.id) ? 'ring-2 ring-green-400' : ''
-                    }`}
+                    } ${mode === 'inspect' ? 'cursor-default' : ''}`}
                     style={{
                       left: `calc(3rem + ${gate.time * 80}px)`,
                     }}
-                    onClick={(e) => handleGateClick(gate.id, e)}
+                    onClick={(e) => mode === 'edit' && handleGateClick(gate.id, e)}
                   >
                     <div className="text-center text-white font-semibold text-xs">
                       {gate.gate}
@@ -218,14 +221,14 @@ const CircuitCanvas = () => {
               </div>
             ))}
 
-            {/* Classical Bits (if any) */}
+             {/* Classical Bits (if any) */}
             {classicalBits > 0 &&
               Array.from({ length: classicalBits }).map((_, bitIndex) => (
                 <div
                   key={`cbit-${bitIndex}`}
-                  className="border-b border-gray-700 h-20 bg-gray-800 relative"
+                  className="border-b border-slate-700 h-20 bg-slate-800 relative"
                 >
-                  <div className="absolute left-0 top-0 bottom-0 w-12 bg-gray-900 border-r border-gray-700 flex items-center justify-center">
+                  <div className="absolute left-0 top-0 bottom-0 w-12 bg-slate-900 border-r border-slate-700 flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">
                       c{bitIndex}
                     </span>
@@ -236,9 +239,9 @@ const CircuitCanvas = () => {
           </div>
         </div>
 
-        {/* Gate Details / Edit Panel */}
+         {/* Gate Details / Edit Panel */}
         {editingGate && (
-          <div className="mt-6 p-4 bg-gray-800 rounded border border-gray-700">
+          <div className="mt-6 p-4 bg-slate-800 rounded border border-slate-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold">
                 Edit {editingGate.gate}
@@ -268,7 +271,7 @@ const CircuitCanvas = () => {
                         },
                       })
                     }
-                    className="ml-2 w-24 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white"
+                    className="ml-2 w-24 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white"
                   />
                 </label>
               </div>

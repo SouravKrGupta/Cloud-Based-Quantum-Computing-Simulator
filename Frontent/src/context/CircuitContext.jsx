@@ -20,6 +20,8 @@ export const CircuitProvider = ({ children }) => {
     result: null,
   });
   const [customGates, setCustomGates] = useState([]);
+  const [history, setHistory] = useState([[]]); // Track circuit changes for undo/redo
+  const [historyIndex, setHistoryIndex] = useState(0);
 
   const normalizeGateName = useCallback((gateName) => {
     const map = {
@@ -44,26 +46,102 @@ export const CircuitProvider = ({ children }) => {
       gate: normalizedGate,
       params,
     };
-    setCircuit((prev) => [...prev, newGate]);
+    setCircuit((prev) => {
+      const newCircuit = [...prev, newGate];
+      // Add to history
+      setHistory((prevHistory) => {
+        const newHistory = prevHistory.slice(0, historyIndex + 1);
+        newHistory.push([...newCircuit]);
+        return newHistory;
+      });
+      setHistoryIndex((prevIndex) => prevIndex + 1);
+      return newCircuit;
+    });
     return newGate;
-  }, [normalizeGateName]);
+  }, [normalizeGateName, historyIndex]);
 
   // Remove gate from circuit
   const removeGate = useCallback((gateId) => {
-    setCircuit((prev) => prev.filter((g) => g.id !== gateId));
-  }, []);
+    setCircuit((prev) => {
+      const newCircuit = prev.filter((g) => g.id !== gateId);
+      // Add to history
+      setHistory((prevHistory) => {
+        const newHistory = prevHistory.slice(0, historyIndex + 1);
+        newHistory.push([...newCircuit]);
+        return newHistory;
+      });
+      setHistoryIndex((prevIndex) => prevIndex + 1);
+      return newCircuit;
+    });
+  }, [historyIndex]);
 
   // Update gate parameters
   const updateGate = useCallback((gateId, updates) => {
-    setCircuit((prev) =>
-      prev.map((g) => (g.id === gateId ? { ...g, ...updates } : g))
-    );
-  }, []);
+    setCircuit((prev) => {
+      const newCircuit = prev.map((g) => (g.id === gateId ? { ...g, ...updates } : g));
+      // Add to history
+      setHistory((prevHistory) => {
+        const newHistory = prevHistory.slice(0, historyIndex + 1);
+        newHistory.push([...newCircuit]);
+        return newHistory;
+      });
+      setHistoryIndex((prevIndex) => prevIndex + 1);
+      return newCircuit;
+    });
+  }, [historyIndex]);
 
   // Clear circuit
   const clearCircuit = useCallback(() => {
     setCircuit([]);
+    // Add to history
+    setHistory([[]]);
+    setHistoryIndex(0);
   }, []);
+
+  // Undo last operation
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setCircuit([...history[newIndex]]);
+    }
+  }, [history, historyIndex]);
+
+  // Redo last operation
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setCircuit([...history[newIndex]]);
+    }
+  }, [history, historyIndex]);
+
+  // Align gates to grid
+  const alignGates = useCallback((alignmentType) => {
+    setAlignment(alignmentType);
+    
+    if (alignmentType === 'left') {
+      // Left align all gates (time=0)
+      setCircuit((prev) => 
+        prev.map(gate => ({ ...gate, time: 0 }))
+      );
+    } else if (alignmentType === 'layers') {
+      // Layer alignment - group gates by time slot
+      const timeSlots = {};
+      const alignedCircuit = [...circuit];
+      
+      alignedCircuit.forEach((gate, index) => {
+        if (!timeSlots[gate.qubitIndex]) {
+          timeSlots[gate.qubitIndex] = 0;
+        }
+        gate.time = timeSlots[gate.qubitIndex];
+        timeSlots[gate.qubitIndex]++;
+      });
+      
+      setCircuit(alignedCircuit);
+    }
+    // 'free' alignment doesn't change positions
+  }, [circuit]);
 
   // Generate OpenQASM code
   const generateOpenQASM = useCallback(() => {
@@ -255,6 +333,7 @@ export const CircuitProvider = ({ children }) => {
     setInspectIndex,
     alignment,
     setAlignment,
+    alignGates,
     visualizations,
     setVisualizations,
     execution,
@@ -270,6 +349,10 @@ export const CircuitProvider = ({ children }) => {
     saveCircuit,
     loadCircuit,
     getSavedCircuits,
+    undo,
+    redo,
+    canUndo: historyIndex > 0,
+    canRedo: historyIndex < history.length - 1,
   };
 
   return (
