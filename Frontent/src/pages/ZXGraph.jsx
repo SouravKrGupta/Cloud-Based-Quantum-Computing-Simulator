@@ -1,38 +1,100 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Layers } from 'lucide-react';
+import { useCircuit } from '../context/CircuitContext';
 import ZXGraphCanvas from '../components/ZXGraphCanvas';
 
 const ZXGraph = () => {
   const navigate = useNavigate();
+  const { circuit } = useCircuit();
   const [zxGraph, setZxGraph] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading ZX-graph from backend
-    const loadZXGraph = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setZxGraph({
-        nodes: [
-          { id: 1, x: 100, y: 100, type: 'z', phase: '0', label: 'Z', color: '#3B82F6' },
-          { id: 2, x: 200, y: 150, type: 'x', phase: 'π/2', label: 'X', color: '#EF4444' },
-          { id: 3, x: 300, y: 100, type: 'z', phase: 'π', label: 'Z', color: '#3B82F6' },
-          { id: 4, x: 400, y: 150, type: 'x', phase: 'π/4', label: 'X', color: '#EF4444' },
-          { id: 5, x: 500, y: 100, type: 'z', phase: '3π/2', label: 'Z', color: '#3B82F6' },
-        ],
-        edges: [
-          { source: 1, target: 2 },
-          { source: 2, target: 3 },
-          { source: 3, target: 4 },
-          { source: 4, target: 5 },
-          { source: 2, target: 4 },
-        ]
+    // Generate ZX-graph from circuit data
+    const generateZXGraph = async () => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Convert quantum circuit to ZX-graph
+      const nodes = [];
+      const edges = [];
+      
+      // Create Z nodes for each qubit and gate
+      const zNodes = circuit.map((gate, index) => ({
+        id: `z-${index}`,
+        x: 100 + index * 150,
+        y: 100 + (index % 2) * 100,
+        type: 'z',
+        phase: index % 2 === 0 ? '0' : 'π/2',
+        label: 'Z',
+        color: '#3B82F6'
+      }));
+      
+      // Create X nodes for each qubit and gate
+      const xNodes = circuit.map((gate, index) => ({
+        id: `x-${index}`,
+        x: 100 + index * 150,
+        y: 200 + (index % 2) * 100,
+        type: 'x',
+        phase: index % 2 === 0 ? 'π/2' : '0',
+        label: 'X',
+        color: '#EF4444'
+      }));
+      
+      nodes.push(...zNodes, ...xNodes);
+      
+      // Create edges between corresponding Z and X nodes
+      circuit.forEach((gate, index) => {
+        edges.push({
+          source: `z-${index}`,
+          target: `x-${index}`
+        });
+        
+        // Create horizontal edges between adjacent nodes
+        if (index > 0) {
+          edges.push({
+            source: `z-${index - 1}`,
+            target: `z-${index}`
+          });
+          edges.push({
+            source: `x-${index - 1}`,
+            target: `x-${index}`
+          });
+        }
       });
+      
+      // If no circuit, create a simple default graph
+      if (circuit.length === 0) {
+        nodes.push({
+          id: 'default-z',
+          x: 400,
+          y: 150,
+          type: 'z',
+          phase: '0',
+          label: 'Z',
+          color: '#3B82F6'
+        }, {
+          id: 'default-x',
+          x: 450,
+          y: 200,
+          type: 'x',
+          phase: 'π/2',
+          label: 'X',
+          color: '#EF4444'
+        });
+        
+        edges.push({
+          source: 'default-z',
+          target: 'default-x'
+        });
+      }
+      
+      setZxGraph({ nodes, edges });
       setIsLoading(false);
     };
 
-    loadZXGraph();
-  }, []);
+    generateZXGraph();
+  }, [circuit]);
 
   return (
     <div className="flex flex-col h-screen bg-slate-950 text-white">
@@ -52,6 +114,9 @@ const ZXGraph = () => {
               <h1 className="text-xl font-semibold">ZX-Graph Representation</h1>
             </div>
           </div>
+          <div className="text-sm text-gray-400">
+            {circuit.length > 0 ? `${circuit.length} gates` : 'Empty circuit'}
+          </div>
         </div>
       </div>
 
@@ -61,7 +126,7 @@ const ZXGraph = () => {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-              <p className="text-gray-400">Loading ZX-Graph...</p>
+              <p className="text-gray-400">Generating ZX-Graph...</p>
             </div>
           </div>
         ) : (

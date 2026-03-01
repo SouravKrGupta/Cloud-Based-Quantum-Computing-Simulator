@@ -22,20 +22,20 @@ const ZXGraphCanvas = ({ circuit, zxGraph }) => {
   const createSampleGraph = () => {
     // Create some nodes
     const newNodes = [
-      { id: 1, x: 100, y: 100, type: 'z', phase: '0', label: 'Z', color: '#3B82F6' },
-      { id: 2, x: 200, y: 150, type: 'x', phase: 'π/2', label: 'X', color: '#EF4444' },
-      { id: 3, x: 300, y: 100, type: 'z', phase: 'π', label: 'Z', color: '#3B82F6' },
-      { id: 4, x: 400, y: 150, type: 'x', phase: 'π/4', label: 'X', color: '#EF4444' },
-      { id: 5, x: 500, y: 100, type: 'z', phase: '3π/2', label: 'Z', color: '#3B82F6' },
+      { id: 'z-1', x: 100, y: 100, type: 'z', phase: '0', label: 'Z', color: '#3B82F6' },
+      { id: 'x-1', x: 200, y: 150, type: 'x', phase: 'π/2', label: 'X', color: '#EF4444' },
+      { id: 'z-2', x: 300, y: 100, type: 'z', phase: 'π', label: 'Z', color: '#3B82F6' },
+      { id: 'x-2', x: 400, y: 150, type: 'x', phase: 'π/4', label: 'X', color: '#EF4444' },
+      { id: 'z-3', x: 500, y: 100, type: 'z', phase: '3π/2', label: 'Z', color: '#3B82F6' },
     ];
 
     // Create edges
     const newEdges = [
-      { source: 1, target: 2 },
-      { source: 2, target: 3 },
-      { source: 3, target: 4 },
-      { source: 4, target: 5 },
-      { source: 2, target: 4 },
+      { source: 'z-1', target: 'x-1' },
+      { source: 'x-1', target: 'z-2' },
+      { source: 'z-2', target: 'x-2' },
+      { source: 'x-2', target: 'z-3' },
+      { source: 'x-1', target: 'x-2' },
     ];
 
     setNodes(newNodes);
@@ -121,13 +121,29 @@ const ZXGraphCanvas = ({ circuit, zxGraph }) => {
     }
   };
 
+  // Make canvas responsive
+  useEffect(() => {
+    const handleResize = () => {
+      const container = canvasRef.current?.parentElement;
+      if (container) {
+        canvasRef.current.width = container.clientWidth;
+        canvasRef.current.height = container.clientHeight;
+      }
+    };
+
+    // Initial size
+    handleResize();
+
+    // Listen for window resize
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="relative w-full h-full">
       <canvas
         ref={canvasRef}
-        width={800}
-        height={400}
-        className="border border-gray-700 rounded-md bg-gray-800 cursor-crosshair"
+        className="border border-gray-700 rounded-md bg-gray-800 cursor-crosshair w-full h-full"
         onClick={handleCanvasClick}
       />
       <div className="absolute top-2 left-2 bg-gray-800 bg-opacity-80 rounded px-2 py-1 text-sm text-white">
