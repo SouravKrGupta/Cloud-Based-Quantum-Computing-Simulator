@@ -14,6 +14,7 @@ import {
   Play,
   Download,
 } from 'lucide-react';
+import BackButton from './BackButton';
 
 const Toolbar = ({ onRun }) => {
   const navigate = useNavigate();
@@ -89,8 +90,10 @@ const Toolbar = ({ onRun }) => {
      <div className="bg-slate-900 text-white border-b border-slate-700 py-3 px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left section: File operations */}
+         <BackButton />
         <div className="flex items-center gap-4">
           <div className="relative">
+           
             <button
               onClick={() => setShowMenu(!showMenu)}
               className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-800 transition"
