@@ -1,102 +1,226 @@
 # QuantumSim - Cloud-Based Quantum Computing Simulator
 
-A cloud-based quantum computing simulator with user authentication and quantum circuit design capabilities.
+## Overview
 
-## Features
+QuantumSim is a cloud-based quantum computing simulator that provides an intuitive interface for designing, simulating, and visualizing quantum circuits. It supports voice commands, ZX-calculus visualization, and real-time quantum circuit simulation.
 
-- **User Authentication**: Secure login, signup, and OTP verification
-- **Quantum Circuit Simulation**: Build and simulate quantum circuits
-- **Cloud Storage**: Save and load quantum circuits from the cloud
-- **Collaboration**: Share quantum circuits with other users
-- **Responsive Design**: Works on desktop and mobile devices
-
-## Tech Stack
+## Architecture
 
 ### Frontend
-- React 18
-- Vite
-- Tailwind CSS
-- Axios
+
+- **Technology Stack**: React 19, Tailwind CSS 4, Vite, React Router, Axios, Lucide React
+- **Key Features**:
+  - Intuitive drag-and-drop quantum circuit composer
+  - Real-time quantum state visualization
+  - Voice command recognition for circuit creation
+  - Quantum state visualization with interactive Bloch spheres and state vector diagrams
+  - ZX-calculus graph visualization and simplification
 
 ### Backend
-- Django 4.x
-- Django REST Framework
-- Simple JWT
-- PostgreSQL
 
-### Database
-- PostgreSQL (production)
-- SQLite (development)
+- **Technology Stack**: Django 4.2, Django REST Framework, MySQL, Django REST Framework SimpleJWT, Social Django
+- **Key Features**:
+  - User authentication and authorization
+  - Quantum circuit simulation using Qiskit
+  - ZX-calculus graph generation and simplification
+  - Circuit to ZX-graph conversion and vice versa
+  - Contact form handling and storage
+  - Real-time statistics endpoint
 
-## Installation
+## Data Flow
+
+### Quantum Circuit Composition and Simulation
+
+1. **User composes quantum circuit** in the frontend using drag-and-drop interface
+2. **Circuit data is sent to backend** via POST request to `/api/simulate/`
+3. **Backend simulates circuit** using Qiskit and returns results
+4. **Frontend visualizes results** with probability distributions and quantum state diagrams
+
+### ZX-Calculus Visualization
+
+1. **User designs quantum circuit** in the frontend
+2. **Circuit is converted to ZX-graph** via POST request to `/api/circuit-to-zx/`
+3. **Backend processes circuit** using zx-calculus library
+4. **ZX-graph is returned** to frontend for visualization
+5. **User can simplify ZX-graph** via POST request to `/api/zx-simplify/`
+6. **Simplified circuit can be retrieved** from ZX-graph via POST request to `/api/zx-to-circuit/`
+
+### Voice Command Processing
+
+1. **User issues voice command** using frontend voice interface
+2. **Voice is recorded and sent to backend** via POST request to `/api/voice-command/`
+3. **Backend processes command** using speech recognition
+4. **Command is executed** and results are returned to frontend
+5. **Frontend updates UI** based on command execution
+
+## User Cases
+
+### User Registration and Authentication
+
+- **New user signs up** by providing email and password
+- **User verifies email** using OTP sent to registered email
+- **User logs in** using email and password or Google OAuth
+- **Password reset** functionality via email verification
+
+### Quantum Circuit Management
+
+- **Create new quantum circuit** with desired number of qubits and gates
+- **Save quantum circuits** to user account
+- **Load saved circuits** from user profile
+- **Share circuits** with other users
+- **Make circuits public** for everyone to access
+
+### Contact Form
+
+- **User fills out contact form** with name, email, subject, and message
+- **Form data is sent to backend** via POST request to `/api/contact/`
+- **Backend stores message** in MySQL database
+- **User receives confirmation** that message has been sent
+
+## API Endpoints
+
+### Authentication
+
+- `POST /api/register/` - User registration
+- `POST /api/login/` - User login
+- `POST /api/logout/` - User logout
+- `POST /api/verify-otp/` - OTP verification
+- `POST /api/resend-otp/` - Resend OTP
+- `POST /api/forgot-password/` - Forgot password
+- `POST /api/reset-password/` - Reset password
+
+### Quantum Circuits
+
+- `GET /api/circuits/` - Get all user's circuits
+- `POST /api/circuits/` - Create new circuit
+- `GET /api/circuits/<int:circuit_id>/` - Get specific circuit
+- `PUT /api/circuits/<int:circuit_id>/` - Update circuit
+- `DELETE /api/circuits/<int:circuit_id>/` - Delete circuit
+- `POST /api/simulate/` - Simulate circuit
+
+### ZX-Calculus
+
+- `POST /api/circuit-to-zx/` - Convert circuit to ZX-graph
+- `POST /api/zx-simplify/` - Simplify ZX-graph
+- `POST /api/zx-to-circuit/` - Convert ZX-graph to circuit
+
+### Voice Commands
+
+- `POST /api/voice-command/` - Process voice command
+- `POST /api/text-to-circuit/` - Process text command to circuit
+
+### Code Generation
+
+- `POST /api/generate-python/` - Generate Python code from circuit
+- `POST /api/generate-qasm/` - Generate QASM code from circuit
+
+### Statistics
+
+- `GET /api/statistics/` - Get platform statistics
+
+### Contact
+
+- `POST /api/contact/` - Submit contact message
+- `GET /api/contact/messages/` - Get all contact messages (admin only)
+- `GET /api/contact/messages/<int:message_id>/` - Get specific contact message (admin only)
+
+## Setup Instructions
 
 ### Prerequisites
-- Node.js 16+
+
 - Python 3.8+
-- PostgreSQL (optional, for production)
+- Node.js 16+
+- MySQL 8.0+
+
+### Backend Setup
+
+1. Navigate to Backend directory:
+   ```bash
+   cd Backend
+   ```
+
+2. Create virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate virtual environment:
+   - Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - Linux/macOS:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Configure MySQL database in `Backend/backend/settings.py`
+
+6. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
+
+7. Start development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+### Frontend Setup
+
+1. Navigate to Frontent directory:
+   ```bash
+   cd Frontent
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+## Running the Application
+
+- Backend will be available at `http://localhost:8000`
+- Frontend will be available at `http://localhost:5173`
+
+## Technologies Used
 
 ### Frontend
-```bash
-cd Frontent
-npm install
-npm run dev
-```
+
+- React 19
+- Tailwind CSS 4
+- Vite
+- React Router
+- Axios
+- Lucide React
+- Web Speech API
 
 ### Backend
-```bash
-cd Backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # macOS/Linux
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
 
-## Environment Variables
+- Django 4.2
+- Django REST Framework
+- MySQL
+- Django REST Framework SimpleJWT
+- Social Django
+- Qiskit
+- zx-calculus library
 
-### Backend (.env)
-```env
-SECRET_KEY=your-secret-key
-DEBUG=True
-ALLOWED_HOSTS=127.0.0.1,localhost
-CORS_ALLOWED_ORIGINS=http://localhost:5173
-DATABASE_URL=postgres://user:password@localhost:5432/quantumsim
-```
+## Contributors
 
-### Frontend (.env)
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
-```
-
-## API Documentation
-
-API documentation is available at:
-- Swagger: http://localhost:8000/api/docs/
-- ReDoc: http://localhost:8000/api/redoc/
-
-## Usage
-
-1. **Sign up**: Create a new account with your email
-2. **Verify OTP**: Check your email for verification code
-3. **Login**: Use your credentials to access the dashboard
-4. **Create Quantum Circuit**: Start building your quantum circuit
-5. **Simulate**: Run the simulation to see results
-6. **Save/Share**: Save your circuit to the cloud or share with others
-
-## Contributing
-
-1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Run tests
-5. Submit a pull request
+- **Dr. Kuntal Mukherjee** - Project Mentor (Faculty)
+- **Ishan Sinha** - M.Tech Student (Frontend & Backend)
+- **Kaushik Tirkey** - M.Tech Student (Frontend & Backend)
 
 ## License
 
-MIT License
-
-## Contact
-
-For questions or support, please email us at quantum@example.com
+This project is licensed under the MIT License.
