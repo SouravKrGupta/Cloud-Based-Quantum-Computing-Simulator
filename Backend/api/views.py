@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .models import CustomUser, OTPVerification, QuantumCircuit, SimulationResult
+from .models import CustomUser, OTPVerification, QuantumCircuit, SimulationResult, ContactMessage
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
@@ -19,7 +19,8 @@ from .serializers import (
     ForgotPasswordSerializer,
     ResetPasswordSerializer,
     QuantumCircuitSerializer,
-    SimulationResultSerializer
+    SimulationResultSerializer,
+    ContactMessageSerializer
 )
 
 
@@ -34,8 +35,7 @@ class HealthCheckView(APIView):
             'application': {
                 'name': 'QuantumSim',
                 'version': '1.0.0',
-                'description': 'Cloud-based quantum computing simulator',
-                'author': 'Zypject.com'
+                'description': 'Cloud-based quantum computing simulator'
             },
             'endpoints': {
                 'register': '/api/register/',
@@ -51,6 +51,26 @@ class HealthCheckView(APIView):
                 'email_service': 'available',
                 'social_auth': 'enabled'
             }
+        }, status=status.HTTP_200_OK)
+
+
+class StatisticsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        # Get real statistics from database
+        active_users = CustomUser.objects.count()
+        quantum_circuits = QuantumCircuit.objects.count()
+        
+        # Hardcoded values for uptime and support (since they don't change frequently)
+        uptime = '99.9%'
+        support = '24/7'
+        
+        return Response({
+            'active_users': f'{active_users}+',
+            'quantum_circuits': f'{quantum_circuits}+',
+            'uptime': uptime,
+            'support': support
         }, status=status.HTTP_200_OK)
 
 
@@ -695,6 +715,125 @@ class PublicQuantumCircuitsView(APIView):
             'success': True,
             'data': serializer.data
         }, status=status.HTTP_200_OK)
+
+
+class ContactMessageView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        """Create a new contact message"""
+        serializer = ContactMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Thank you for your message! We will get back to you soon.'
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response({
+            'success': False,
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContactMessagesListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Get all contact messages (admin only)"""
+        if not request.user.is_staff:
+            return Response({
+                'success': False,
+                'message': 'You do not have permission to access this resource'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        messages = ContactMessage.objects.all().order_by('-created_at')
+        serializer = ContactMessageSerializer(messages, many=True)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class ContactMessageDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, message_id):
+        """Get a specific contact message (admin only)"""
+        if not request.user.is_staff:
+            return Response({
+                'success': False,
+                'message': 'You do not have permission to access this resource'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            message = ContactMessage.objects.get(id=message_id)
+            serializer = ContactMessageSerializer(message)
+            
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except ContactMessage.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Message not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, message_id):
+        """Update a contact message (admin only)"""
+        if not request.user.is_staff:
+            return Response({
+                'success': False,
+                'message': 'You do not have permission to access this resource'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            message = ContactMessage.objects.get(id=message_id)
+            serializer = ContactMessageSerializer(message, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'success': True,
+                    'data': serializer.data
+                }, status=status.HTTP_200_OK)
+            
+            return Response({
+                'success': False,
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        except ContactMessage.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Message not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, message_id):
+        """Delete a contact message (admin only)"""
+        if not request.user.is_staff:
+            return Response({
+                'success': False,
+                'message': 'You do not have permission to access this resource'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            message = ContactMessage.objects.get(id=message_id)
+            message.delete()
+            
+            return Response({
+                'success': True,
+                'message': 'Message deleted successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except ContactMessage.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Message not found'
+            }, status=status.HTTP_404_NOT_FOUND)
 
 
 # Google OAuth Views

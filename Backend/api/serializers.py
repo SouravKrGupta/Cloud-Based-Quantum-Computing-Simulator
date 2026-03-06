@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, QuantumCircuit, SimulationResult
+from .models import CustomUser, QuantumCircuit, SimulationResult,ContactMessage
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -71,3 +71,10 @@ class SimulationResultSerializer(serializers.ModelSerializer):
         model = SimulationResult
         fields = ['id', 'circuit', 'state_vector', 'probability_distribution', 'measurements', 'execution_time', 'created_at', 'qubit_count', 'gate_count', 'shots']
         read_only_fields = ['id', 'created_at']
+
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = ['id', 'name', 'email', 'subject', 'message', 'created_at', 'is_read']
+        read_only_fields = ['id', 'created_at', 'is_read']

@@ -139,9 +139,9 @@ const Visualizations = () => {
         }
         case 'CNOT':
         case 'CX': {
-          const rawControl = Number(gateOp?.params?.control);
-          const control = Number.isInteger(rawControl) ? Math.max(0, Math.min(n - 1, rawControl)) : q === 0 ? 1 : q - 1;
-          state = applyCnot(state, n, control, q);
+          const rawTarget = Number(gateOp?.params?.target);
+          const target = Number.isInteger(rawTarget) ? Math.max(0, Math.min(n - 1, rawTarget)) : (q + 1) % n;
+          state = applyCnot(state, n, q, target);
           break;
         }
         default:

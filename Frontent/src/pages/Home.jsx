@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
@@ -6,6 +6,31 @@ const Home = () => {
   const secondaryCtaRoute = isLoggedIn ? '/profile' : '/signup';
   const secondaryCtaLabel = isLoggedIn ? 'Go to Profile' : 'Get Started for Free';
   const footerCtaLabel = isLoggedIn ? 'Go to Profile' : 'Sign Up Free';
+  
+  const [statistics, setStatistics] = useState({
+    active_users: '1000+',
+    quantum_circuits: '5000+',
+    uptime: '99.9%',
+    support: '24/7'
+  });
+
+  useEffect(() => {
+    // Fetch real statistics from backend API
+    const fetchStatistics = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/statistics/');
+        if (response.ok) {
+          const data = await response.json();
+          setStatistics(data);
+        }
+      } catch (error) {
+        console.error('Error fetching statistics:', error);
+        // Keep using default values if API fails
+      }
+    };
+
+    fetchStatistics();
+  }, []);
 
   return (
      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
@@ -133,19 +158,19 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">1000+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">{statistics.active_users}</div>
               <div className="text-lg md:text-xl text-white/80">Active Users</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">5000+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">{statistics.quantum_circuits}</div>
               <div className="text-lg md:text-xl text-white/80">Quantum Circuits</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">99.9%</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">{statistics.uptime}</div>
               <div className="text-lg md:text-xl text-white/80">Uptime</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-bold mb-2">24/7</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">{statistics.support}</div>
               <div className="text-lg md:text-xl text-white/80">Support</div>
             </div>
           </div>

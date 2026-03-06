@@ -11,29 +11,162 @@ const ZXGraphCanvas = ({ circuit, zxGraph }) => {
   useEffect(() => {
     if (zxGraph) {
       // Use provided ZX-graph data
-      const formattedNodes = zxGraph.nodes?.map(node => ({
-        ...node,
-        x: node.position?.x || 0,
-        y: node.position?.y || 0,
-        color: node.type === 'x' ? '#EF4444' : (node.type === 'y' ? '#F59E0B' : '#3B82F6'),
-        label: node.label || node.type.toUpperCase(),
-        phase: node.phase !== undefined ? formatPhase(node.phase) : '0'
-      })) || [];
-      setNodes(formattedNodes);
+      setNodes(zxGraph.nodes || []);
       setEdges(zxGraph.edges || []);
-    } else if (circuit) {
-      // Create sample ZX-graph from circuit data
+    } else if (circuit && circuit.length > 0) {
+      // Build ZX graph from circuit data
+      const zxGraph = buildZXGraphFromCircuit(circuit);
+      setNodes(zxGraph.nodes);
+      setEdges(zxGraph.edges);
+    } else {
+      // Create sample ZX-graph when no circuit data
       createSampleGraph();
     }
   }, [circuit, zxGraph]);
 
-  const formatPhase = (phase) => {
-    if (phase === 0) return '0';
-    if (phase === Math.PI) return 'π';
-    if (phase === Math.PI / 2) return 'π/2';
-    if (phase === Math.PI / 4) return 'π/4';
-    if (phase === 3 * Math.PI / 2) return '3π/2';
-    return phase.toFixed(2);
+
+
+
+
+
+
+
+
+
+  const buildZXGraphFromCircuit = (circuitData) => {
+    // Simple ZX graph construction from quantum circuit
+    const newNodes = [];
+    const newEdges = [];
+    const qubitPositions = {};
+    
+    // Add qubit inputs (Z spiders)
+    circuitData.forEach(gate => {
+      if (!qubitPositions[gate.qubitIndex]) {
+        const x = 100 + gate.qubitIndex * 150;
+        const y = 50;
+        qubitPositions[gate.qubitIndex] = {
+          x,
+          y,
+          currentNodeId: `q${gate.qubitIndex}_0`
+        };
+        
+        newNodes.push({
+          id: `q${gate.qubitIndex}_0`,
+          x,
+          y,
+          type: 'z',
+          phase: '0',
+          label: 'Z',
+          color: '#3B82F6'
+        });
+      }
+    });
+
+    // Process each gate and build ZX graph
+    circuitData.forEach(gate => {
+      const qubitPos = qubitPositions[gate.qubitIndex];
+      const timeStep = gate.time;
+      const nodeId = `q${gate.qubitIndex}_${timeStep + 1}`;
+      
+      // Add new node based on gate type
+      if (gate.gate === 'H') {
+        // Hadamard is X spider
+        newNodes.push({
+          id: nodeId,
+          x: qubitPos.x,
+          y: 100 + timeStep * 100,
+          type: 'x',
+          phase: '0',
+          label: 'X',
+          color: '#EF4444'
+        });
+      } else if (gate.gate === 'X') {
+        // X is X spider with phase π
+        newNodes.push({
+          id: nodeId,
+          x: qubitPos.x,
+          y: 100 + timeStep * 100,
+          type: 'x',
+          phase: 'π',
+          label: 'X',
+          color: '#EF4444'
+        });
+      } else if (gate.gate === 'Z') {
+        // Z is Z spider with phase π
+        newNodes.push({
+          id: nodeId,
+          x: qubitPos.x,
+          y: 100 + timeStep * 100,
+          type: 'z',
+          phase: 'π',
+          label: 'Z',
+          color: '#3B82F6'
+        });
+      } else if (gate.gate === 'S') {
+        // S is Z spider with phase π/2
+        newNodes.push({
+          id: nodeId,
+          x: qubitPos.x,
+          y: 100 + timeStep * 100,
+          type: 'z',
+          phase: 'π/2',
+          label: 'Z',
+          color: '#3B82F6'
+        });
+      } else if (gate.gate === 'T') {
+        // T is Z spider with phase π/4
+        newNodes.push({
+          id: nodeId,
+          x: qubitPos.x,
+          y: 100 + timeStep * 100,
+          type: 'z',
+          phase: 'π/4',
+          label: 'Z',
+          color: '#3B82F6'
+        });
+      } else if (gate.gate === 'CNOT') {
+        // CNOT is X spider between control and target
+        const targetQubit = gate.params.target;
+        const targetPos = qubitPositions[targetQubit];
+        
+        const controlNodeId = `q${gate.qubitIndex}_${timeStep + 1}`;
+        const targetNodeId = `q${targetQubit}_${timeStep + 1}`;
+        
+        newNodes.push({
+          id: controlNodeId,
+          x: qubitPos.x,
+          y: 100 + timeStep * 100,
+          type: 'z',
+          phase: '0',
+          label: 'Z',
+          color: '#3B82F6'
+        });
+        
+        newNodes.push({
+          id: targetNodeId,
+          x: targetPos.x,
+          y: 100 + timeStep * 100,
+          type: 'x',
+          phase: '0',
+          label: 'X',
+          color: '#EF4444'
+        });
+        
+        newEdges.push({ source: controlNodeId, target: targetNodeId });
+        newEdges.push({ source: qubitPos.currentNodeId, target: controlNodeId });
+        newEdges.push({ source: targetPos.currentNodeId, target: targetNodeId });
+        
+        qubitPositions[gate.qubitIndex].currentNodeId = controlNodeId;
+        qubitPositions[targetQubit].currentNodeId = targetNodeId;
+        return;
+      }
+      
+      // Connect current node to previous node
+      newEdges.push({ source: qubitPos.currentNodeId, target: nodeId });
+      qubitPositions[gate.qubitIndex].currentNodeId = nodeId;
+    });
+
+    return { nodes: newNodes, edges: newEdges };
   };
 
   const createSampleGraph = () => {

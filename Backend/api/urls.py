@@ -15,7 +15,11 @@ from .views import (
     QuantumCircuitSimulationResultsView,
     QuantumCircuitShareView,
     QuantumCircuitPublicView,
-    PublicQuantumCircuitsView
+    PublicQuantumCircuitsView,
+    ContactMessageView,
+    ContactMessagesListView,
+    ContactMessageDetailView,
+    StatisticsView
 )
 from .google_views import google_success_view
 from .voice_views import VoiceCommandView, TextToCircuitView
@@ -55,4 +59,12 @@ urlpatterns = [
     path('circuit-to-zx/', CircuitToZXGraphView.as_view(), name='circuit-to-zx'),
     path('zx-simplify/', ZXGraphSimplificationView.as_view(), name='zx-simplify'),
     path('zx-to-circuit/', ZXGraphToCircuitView.as_view(), name='zx-to-circuit'),
+    
+    # Contact Message Endpoints
+    path('contact/', ContactMessageView.as_view(), name='contact'),
+    path('contact/messages/', ContactMessagesListView.as_view(), name='contact-messages'),
+    path('contact/messages/<int:message_id>/', ContactMessageDetailView.as_view(), name='contact-message-detail'),
+    
+    # Statistics Endpoint
+    path('statistics/', StatisticsView.as_view(), name='statistics'),
 ]

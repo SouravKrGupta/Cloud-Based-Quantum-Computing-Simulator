@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Zap, Download, Code, Upload, Maximize2, Move, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import ZXGraphCanvas from '../components/ZXGraphCanvas';
 import CircuitMetrics from '../components/CircuitMetrics';
+import CircuitCanvas from '../components/CircuitCanvas';
+import { useCircuit } from '../context/CircuitContext';
 
 const ZXLab = () => {
+  const { circuit, qubits, classicalBits } = useCircuit();
   const [circuitView, setCircuitView] = useState('circuit'); // 'circuit' or 'zx'
   const [qasmCode, setQasmCode] = useState(`// Sample Quantum Circuit in OpenQASM 2.0
 OPENQASM 2.0;
@@ -49,6 +52,130 @@ measure q -> c;`);
   });
 
   const [optimizedMetrics, setOptimizedMetrics] = useState(null);
+
+  // Generate OpenQASM code from circuit
+  const generateQASM = useCallback(() => {
+    let code = `OPENQASM 2.0;\ninclude "qelib1.inc";\n\n`;
+    code += `qreg q[${qubits}];\n`;
+    if (classicalBits > 0) {
+      code += `creg c[${classicalBits}];\n`;
+    }
+    code += `\n`;
+
+    circuit.forEach(gate => {
+      const timeSlot = gate.time;
+      const qubitIndex = gate.qubitIndex;
+      
+      switch(gate.gate) {
+        case 'H':
+          code += `h q[${qubitIndex}];\n`;
+          break;
+        case 'X':
+          code += `x q[${qubitIndex}];\n`;
+          break;
+        case 'Y':
+          code += `y q[${qubitIndex}];\n`;
+          break;
+        case 'Z':
+          code += `z q[${qubitIndex}];\n`;
+          break;
+        case 'S':
+          code += `s q[${qubitIndex}];\n`;
+          break;
+        case 'T':
+          code += `t q[${qubitIndex}];\n`;
+          break;
+        case 'SDG':
+          code += `sdg q[${qubitIndex}];\n`;
+          break;
+        case 'TDG':
+          code += `tdg q[${qubitIndex}];\n`;
+          break;
+        case 'CNOT':
+          if (gate.params?.target !== undefined) {
+            code += `cx q[${qubitIndex}], q[${gate.params.target}];\n`;
+          }
+          break;
+        case 'Measure':
+          if (gate.params?.classicalBit !== undefined) {
+            code += `measure q[${qubitIndex}] -> c[${gate.params.classicalBit}];\n`;
+          }
+          break;
+      }
+    });
+
+    setQasmCode(code);
+  }, [circuit, qubits, classicalBits]);
+
+  // Generate Python code from circuit
+  const generatePython = useCallback(() => {
+    let code = `from qiskit import QuantumCircuit, Aer, execute\n\n`;
+    code += `# Create circuit\n`;
+    code += `qc = QuantumCircuit(${qubits}, ${classicalBits})\n`;
+    code += `\n`;
+
+    circuit.forEach(gate => {
+      const qubitIndex = gate.qubitIndex;
+      
+      switch(gate.gate) {
+        case 'H':
+          code += `qc.h(${qubitIndex})\n`;
+          break;
+        case 'X':
+          code += `qc.x(${qubitIndex})\n`;
+          break;
+        case 'Y':
+          code += `qc.y(${qubitIndex})\n`;
+          break;
+        case 'Z':
+          code += `qc.z(${qubitIndex})\n`;
+          break;
+        case 'S':
+          code += `qc.s(${qubitIndex})\n`;
+          break;
+        case 'T':
+          code += `qc.t(${qubitIndex})\n`;
+          break;
+        case 'SDG':
+          code += `qc.sdg(${qubitIndex})\n`;
+          break;
+        case 'TDG':
+          code += `qc.tdg(${qubitIndex})\n`;
+          break;
+        case 'CNOT':
+          if (gate.params?.target !== undefined) {
+            code += `qc.cx(${qubitIndex}, ${gate.params.target})\n`;
+          }
+          break;
+        case 'Measure':
+          if (gate.params?.classicalBit !== undefined) {
+            code += `qc.measure(${qubitIndex}, ${gate.params.classicalBit})\n`;
+          }
+          break;
+      }
+    });
+
+    code += `\n# Execute on simulator\n`;
+    code += `simulator = Aer.get_backend('qasm_simulator')\n`;
+    code += `result = execute(qc, simulator, shots=1024).result()\n`;
+    code += `counts = result.get_counts()\n`;
+    code += `\nprint("Quantum circuit output:")\n`;
+    code += `print(counts)\n`;
+
+    return code;
+  }, [circuit, qubits, classicalBits]);
+
+  // Update metrics based on current circuit
+  const updateMetrics = useCallback(() => {
+    const newMetrics = {
+      qubits: qubits,
+      gates: circuit.length,
+      cnotGates: circuit.filter(g => g.gate === 'CNOT').length,
+      depth: circuit.length > 0 ? Math.max(...circuit.map(g => g.time)) + 1 : 0,
+      tGates: circuit.filter(g => g.gate === 'T' || g.gate === 'TDG').length,
+    };
+    setOriginalMetrics(newMetrics);
+  }, [circuit, qubits]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-950 text-white">
@@ -97,22 +224,43 @@ measure q -> c;`);
                     onClick={() => {
                       // Simulate circuit simplification
                       setOptimizedMetrics({
-                        qubits: 5,
-                        gates: 10,
-                        cnotGates: 3,
-                        depth: 6,
-                        tGates: 2,
+                        qubits: qubits,
+                        gates: Math.floor(circuit.length * 0.7),
+                        cnotGates: Math.floor(circuit.filter(g => g.gate === 'CNOT').length * 0.6),
+                        depth: Math.floor((circuit.length > 0 ? Math.max(...circuit.map(g => g.time)) + 1 : 0) * 0.8),
+                        tGates: Math.floor(circuit.filter(g => g.gate === 'T' || g.gate === 'TDG').length * 0.5),
                       });
                     }}
                   >
                     <Zap size={16} className="mr-2" />
                     Auto-Simplify
                   </button>
-                  <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-gray-600 bg-gray-800 hover:bg-gray-700 h-10 px-4 py-2">
+                  <button 
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-gray-600 bg-gray-800 hover:bg-gray-700 h-10 px-4 py-2"
+                    onClick={() => {
+                      generateQASM();
+                      updateMetrics();
+                    }}
+                  >
                     <Download size={16} className="mr-2" />
                     Export QASM
                   </button>
-                  <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-gray-600 bg-gray-800 hover:bg-gray-700 h-10 px-4 py-2">
+                  <button 
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-gray-600 bg-gray-800 hover:bg-gray-700 h-10 px-4 py-2"
+                    onClick={() => {
+                      const pythonCode = generatePython();
+                      // Create download link
+                      const blob = new Blob([pythonCode], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'quantum_circuit.py';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
                     <Code size={16} className="mr-2" />
                     Export Python
                   </button>
@@ -180,11 +328,13 @@ measure q -> c;`);
                       </button>
                     </div>
                     {circuitView === 'circuit' ? (
-                      <div className="flex items-center justify-center h-[400px] border border-gray-700 rounded-md bg-gray-800">
-                        <p className="text-gray-400">No valid circuit data available</p>
+                      <div className="h-[400px]">
+                        <CircuitCanvas />
                       </div>
                     ) : (
-                      <ZXGraphCanvas qasmCode={qasmCode} />
+                      <div className="h-[400px]">
+                        <ZXGraphCanvas circuit={circuit} />
+                      </div>
                     )}
                   </div>
                 </div>

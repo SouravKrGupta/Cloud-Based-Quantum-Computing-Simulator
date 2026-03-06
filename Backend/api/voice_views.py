@@ -51,6 +51,20 @@ def parse_command(command: str) -> Dict[str, Any]:
     text = command.strip().lower()
     n = _extract_qubit_count(text)
 
+    # Skip gate parsing if command contains negations like "not in" or "not on"
+    if "not in" in text or "not on" in text:
+        if "bell" in text or ("entangle" in text and n >= 2):
+            intent = "bell"
+        elif "superposition" in text:
+            intent = "superposition"
+        elif "ghz" in text and n >= 3:
+            intent = "ghz"
+        else:
+            intent = "empty"
+            
+        wants_measure = ("measure" in text) or ("measurement" in text)
+        return {"intent": intent, "n_qubits": n, "measure": wants_measure, "raw": command}
+
     # Intent detection (priority order)
     # Check for multiple gate commands first
     # Pattern: gate [on] qX, gate [on] qY, etc.
