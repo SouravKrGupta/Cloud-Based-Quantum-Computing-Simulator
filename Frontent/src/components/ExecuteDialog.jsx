@@ -3,7 +3,7 @@ import { useCircuit } from '../context/CircuitContext';
 import { Play, StopCircle, Settings } from 'lucide-react';
 
 const ExecuteDialog = ({ onClose }) => {
-  const { circuit, qubits, setExecution } = useCircuit();
+  const { circuit, qubits, classicalBits, circuitName, customGates, setExecution } = useCircuit();
   const [shots, setShots] = useState(1000);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -23,43 +23,69 @@ const ExecuteDialog = ({ onClose }) => {
     setIsRunning(true);
 
     try {
-      // Call quantum circuit simulation API
-      const response = await fetch('http://localhost:8000/api/simulate/', {
+      // First, save the circuit to backend to get an ID
+      const saveResponse = await fetch('http://localhost:8000/api/circuits/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
+          name: circuitName,
+          description: 'Executed circuit',
           qubits,
+          classical_bits: classicalBits,
           gates: circuit,
-          backend: 'simulator', // Single backend
-          shots,
+          custom_gates: customGates,
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const probabilities = data?.data?.probability_distribution || {};
-        const derivedCounts = Object.fromEntries(
-          Object.entries(probabilities).map(([state, probability]) => [
-            state,
-            Math.round((probability || 0) * shots),
-          ])
-        );
+      if (saveResponse.ok) {
+        const saveData = await saveResponse.json();
+        const circuitId = saveData.data.id;
 
-        setExecution({
-          jobId: data.data.job_id || `SIM-${Date.now()}`,
-          status: 'completed',
-          result: {
-            ...data.data,
-            counts: derivedCounts,
-            shots,
+        // Call quantum circuit simulation API with circuit ID
+        const response = await fetch('http://localhost:8000/api/simulate/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            circuit_id: circuitId,
+            qubits,
+            gates: circuit,
+            backend: 'simulator', // Single backend
+            shots,
+          }),
         });
-        onClose();
+
+        if (response.ok) {
+          const data = await response.json();
+          const probabilities = data?.data?.probability_distribution || {};
+          const derivedCounts = Object.fromEntries(
+            Object.entries(probabilities).map(([state, probability]) => [
+              state,
+              Math.round((probability || 0) * shots),
+            ])
+          );
+
+          setExecution({
+            jobId: data.data.job_id || `SIM-${Date.now()}`,
+            status: 'completed',
+            result: {
+              ...data.data,
+              counts: derivedCounts,
+              shots,
+              circuitId: circuitId,
+            },
+          });
+          onClose();
+        } else {
+          alert('Error running simulation');
+        }
       } else {
-        alert('Error submitting job');
+        alert('Error saving circuit');
       }
     } catch (error) {
       console.error('Error:', error);

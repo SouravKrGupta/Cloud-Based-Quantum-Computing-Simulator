@@ -69,7 +69,9 @@ class QuantumCircuit(models.Model):
     name = models.CharField(max_length=255, default='Untitled Circuit')
     description = models.TextField(blank=True, null=True)
     qubits = models.IntegerField(default=5)
+    classical_bits = models.IntegerField(default=0)
     gates = models.JSONField(default=list)
+    custom_gates = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_public = models.BooleanField(default=False)
@@ -93,6 +95,7 @@ class SimulationResult(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     qubit_count = models.IntegerField()
     gate_count = models.IntegerField()
+    shots = models.IntegerField(default=1000)
 
     class Meta:
         verbose_name = 'Simulation Result'

@@ -52,7 +52,41 @@ def parse_command(command: str) -> Dict[str, Any]:
     n = _extract_qubit_count(text)
 
     # Intent detection (priority order)
-    # Check for direct gate commands first
+    # Check for multiple gate commands first
+    # Pattern: gate [on] qX, gate [on] qY, etc.
+    gate_patterns = r"\b(h|hadamard|x|not|y|z|s|t|cx|cnot)\b.*?\bq(\d+)\b"
+    multiple_gate_matches = re.findall(gate_patterns, text)
+    
+    if multiple_gate_matches:
+        intent = "add_gates"
+        gates = []
+        qubits = set()
+        
+        for gate_match, qubit_match in multiple_gate_matches:
+            gate = gate_match.upper()
+            if gate == "HADAMARD":
+                gate = "H"
+            elif gate == "NOT":
+                gate = "X"
+            elif gate == "CNOT":
+                gate = "CX"
+                
+            qubit = int(qubit_match)
+            qubits.add(qubit)
+            gates.append({"gate": gate, "qubit": qubit})
+        
+        max_qubit = max(qubits) if qubits else 0
+        n_qubits = max(n, max_qubit + 1)
+        
+        return {
+            "intent": intent, 
+            "n_qubits": n_qubits, 
+            "measure": ("measure" in text) or ("measurement" in text), 
+            "raw": command,
+            "gates": gates
+        }
+
+    # Check for single gate commands
     gate_match = re.search(r"\b(h|hadamard|x|not|y|z|s|t|cx|cnot)\b", text)
     if gate_match:
         intent = "add_gate"
@@ -65,27 +99,27 @@ def parse_command(command: str) -> Dict[str, Any]:
             gate = "CX"
         
         # Extract qubit information from various formats: q0, qubit 1, q1, etc.
-        qubits = []
+        qubit_list = []
         # Match q followed by number (q0, q1, q2, etc.)
         qubit_matches = re.findall(r"q(\d+)", text)
         if qubit_matches:
-            qubits.extend(list(map(int, qubit_matches)))
+            qubit_list.extend(list(map(int, qubit_matches)))
         
         # Match "qubit" followed by number (qubit 0, qubit 1, etc.)
         qubit_word_matches = re.findall(r"qubit\s*(\d+)", text)
         if qubit_word_matches:
-            qubits.extend(list(map(int, qubit_word_matches)))
+            qubit_list.extend(list(map(int, qubit_word_matches)))
         
         # Remove duplicates and sort
-        qubits = sorted(list(set(qubits)))
+        qubit_list = sorted(list(set(qubit_list)))
         
         return {
             "intent": intent, 
-            "n_qubits": max(n, max(qubits) + 1) if qubits else n, 
+            "n_qubits": max(n, max(qubit_list) + 1) if qubit_list else n, 
             "measure": ("measure" in text) or ("measurement" in text), 
             "raw": command,
             "gate": gate,
-            "qubits": qubits
+            "qubits": qubit_list
         }
     
     if "bell" in text or ("entangle" in text and n >= 2):
@@ -112,7 +146,32 @@ def build_circuit(parsed: Dict[str, Any]) -> Dict[str, Any]:
     gates = []
     time_slot = 0
 
-    if intent == "add_gate":
+    if intent == "add_gates":
+        # Add multiple specific gates to specified qubits
+        for gate_info in parsed["gates"]:
+            gate = gate_info["gate"]
+            qubit = gate_info["qubit"]
+            
+            if gate == "CX" or gate == "CNOT":
+                # For CNOT, need control and target qubits - default to q0 as control
+                gates.append({
+                    "qubitIndex": qubit,
+                    "gate": "CNOT",
+                    "params": {"target": (qubit + 1) % n},
+                    "time": time_slot
+                })
+            else:
+                # For single-qubit gates
+                gates.append({
+                    "qubitIndex": qubit,
+                    "gate": gate,
+                    "params": {},
+                    "time": time_slot
+                })
+        
+        time_slot += 1
+
+    elif intent == "add_gate":
         # Add specific gate to specified qubit(s)
         gate = parsed["gate"]
         qubits = parsed["qubits"]
@@ -219,6 +278,11 @@ def build_circuit(parsed: Dict[str, Any]) -> Dict[str, Any]:
     if intent == "add_gate":
         qubit_str = ", ".join([f"q{q}" for q in parsed["qubits"]])
         description = f"Added {parsed['gate']} gate to qubit(s) {qubit_str}"
+    elif intent == "add_gates":
+        gate_strs = []
+        for gate_info in parsed["gates"]:
+            gate_strs.append(f"{gate_info['gate']} on q{gate_info['qubit']}")
+        description = f"Added gates: {', '.join(gate_strs)}"
     
     return {
         "qubits": n,

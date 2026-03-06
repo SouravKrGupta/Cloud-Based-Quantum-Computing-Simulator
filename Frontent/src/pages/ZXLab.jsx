@@ -184,7 +184,7 @@ measure q -> c;`);
                         <p className="text-gray-400">No valid circuit data available</p>
                       </div>
                     ) : (
-                      <ZXGraphCanvas circuitData={qasmCode} />
+                      <ZXGraphCanvas qasmCode={qasmCode} />
                     )}
                   </div>
                 </div>

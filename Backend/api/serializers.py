@@ -62,12 +62,12 @@ class ResetPasswordSerializer(serializers.Serializer):
 class QuantumCircuitSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuantumCircuit
-        fields = ['id', 'user', 'name', 'description', 'qubits', 'gates', 'created_at', 'updated_at', 'is_public']
+        fields = ['id', 'user', 'name', 'description', 'qubits', 'classical_bits', 'gates', 'custom_gates', 'created_at', 'updated_at', 'is_public']
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
 
 class SimulationResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = SimulationResult
-        fields = ['id', 'circuit', 'state_vector', 'probability_distribution', 'measurements', 'execution_time', 'created_at', 'qubit_count', 'gate_count']
+        fields = ['id', 'circuit', 'state_vector', 'probability_distribution', 'measurements', 'execution_time', 'created_at', 'qubit_count', 'gate_count', 'shots']
         read_only_fields = ['id', 'created_at']

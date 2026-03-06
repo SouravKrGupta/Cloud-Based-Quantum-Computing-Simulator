@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Mic, StopCircle, CheckCircle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 const VoiceCommand = ({ onCircuitGenerated }) => {
@@ -8,6 +8,7 @@ const VoiceCommand = ({ onCircuitGenerated }) => {
   const [error, setError] = useState('');
   const [transcript, setTranscript] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const recognitionRef = useRef(null);
 
   const sampleCommands = [
     'Create a bell state with two qubits',
@@ -31,21 +32,54 @@ const VoiceCommand = ({ onCircuitGenerated }) => {
     setTranscript('Listening...');
 
     try {
-      // Simulate voice recognition with longer duration
-      await new Promise(resolve => setTimeout(resolve, 4000));
-      
-      // Randomly select a sample command
-      const randomCommand = sampleCommands[Math.floor(Math.random() * sampleCommands.length)];
-      setRecognizedText(randomCommand);
-      setTranscript(`Recognized: "${randomCommand}"`);
+      // Check if browser supports Web Speech API
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        throw new Error('Voice recognition is not supported in your browser. Please use Chrome or Edge.');
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.trim();
+        setRecognizedText(command);
+        setTranscript(`Recognized: "${command}"`);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+          setError('Microphone access denied. Please allow microphone access to use voice commands.');
+        } else if (event.error === 'no-speech') {
+          setError('No speech detected. Please try again.');
+        } else {
+          setError('Voice recognition failed. Please try again.');
+        }
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
     } catch (err) {
-      setError('Voice recognition failed. Please try again.');
-    } finally {
+      setError(err.message);
       setIsListening(false);
     }
   };
 
   const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
     setIsListening(false);
   };
 

@@ -1,35 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Eye, Trash2 } from 'lucide-react';
 
 const Results = () => {
-  const [results, setResults] = useState([
-    {
-      id: 1,
-      jobId: 'JOB-12345',
-      circuitName: 'Bell State',
-      backend: 'Simulator',
-      shots: 1000,
-      date: '2024-02-11',
-      status: 'COMPLETED',
-      mostProbable: '00',
-      count: 532,
-    },
-    {
-      id: 2,
-      jobId: 'JOB-12346',
-      circuitName: 'Superposition Test',
-      backend: 'QuantumSim Cloud',
-      shots: 1024,
-      date: '2024-02-10',
-      status: 'COMPLETED',
-      mostProbable: '01',
-      count: 256,
-    },
-  ]);
-
+  const [results, setResults] = useState([]);
   const [selectedResult, setSelectedResult] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchResults();
+  }, []);
+
+  const fetchResults = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // First, fetch all circuits for the user
+      const circuitsResponse = await fetch('http://localhost:8000/api/circuits/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (circuitsResponse.ok) {
+        const circuitsData = await circuitsResponse.json();
+        const circuits = circuitsData.data;
+        
+        // Fetch simulation results for each circuit
+        const allResults = [];
+        for (const circuit of circuits) {
+          const resultsResponse = await fetch(`http://localhost:8000/api/circuits/${circuit.id}/simulation/`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (resultsResponse.ok) {
+            const resultsData = await resultsResponse.json();
+            const circuitResults = resultsData.data.map(result => ({
+              ...result,
+              circuitName: circuit.name,
+              jobId: `JOB-${result.id}`,
+              backend: 'Simulator',
+              shots: result.shots,
+              status: 'COMPLETED',
+              date: new Date(result.created_at).toISOString().split('T')[0],
+              ...getMostProbableState(result.probability_distribution, result.shots)
+            }));
+            
+            allResults.push(...circuitResults);
+          }
+        }
+
+        setResults(allResults);
+      }
+    } catch (error) {
+      console.error('Error fetching results:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMostProbableState = (probabilityDistribution, shots) => {
+    if (!probabilityDistribution) return { mostProbable: '00', count: 0 };
+    
+    let maxProbability = 0;
+    let mostProbableState = '00';
+    
+    Object.entries(probabilityDistribution).forEach(([state, probability]) => {
+      if (probability > maxProbability) {
+        maxProbability = probability;
+        mostProbableState = state;
+      }
+    });
+
+    return {
+      mostProbable: mostProbableState,
+      count: Math.round(maxProbability * shots)
+    };
+  };
 
   const handleDeleteResult = (id) => {
+    // This should call a backend endpoint to delete the result
     setResults((prev) => prev.filter((result) => result.id !== id));
   };
 
@@ -45,7 +102,11 @@ const Results = () => {
 
       {/* Results List */}
       <div className="flex-1 overflow-auto p-6">
-        {results.length === 0 ? (
+        {loading ? (
+          <div className="text-center text-gray-400 py-12">
+            <p>Loading results...</p>
+          </div>
+        ) : results.length === 0 ? (
           <div className="text-center text-gray-400 py-12">
             <p>No execution results yet.</p>
             <p className="text-sm mt-2">Run a circuit to see results here.</p>

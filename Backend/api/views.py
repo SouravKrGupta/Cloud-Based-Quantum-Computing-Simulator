@@ -564,7 +564,8 @@ class QuantumCircuitSimulationView(APIView):
                         measurements=measurements,
                         execution_time=execution_time,
                         qubit_count=qubits,
-                        gate_count=len(gates)
+                        gate_count=len(gates),
+                        shots=shots
                     )
                 except QuantumCircuit.DoesNotExist:
                     pass

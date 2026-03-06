@@ -11,13 +11,30 @@ const ZXGraphCanvas = ({ circuit, zxGraph }) => {
   useEffect(() => {
     if (zxGraph) {
       // Use provided ZX-graph data
-      setNodes(zxGraph.nodes || []);
+      const formattedNodes = zxGraph.nodes?.map(node => ({
+        ...node,
+        x: node.position?.x || 0,
+        y: node.position?.y || 0,
+        color: node.type === 'x' ? '#EF4444' : (node.type === 'y' ? '#F59E0B' : '#3B82F6'),
+        label: node.label || node.type.toUpperCase(),
+        phase: node.phase !== undefined ? formatPhase(node.phase) : '0'
+      })) || [];
+      setNodes(formattedNodes);
       setEdges(zxGraph.edges || []);
     } else if (circuit) {
       // Create sample ZX-graph from circuit data
       createSampleGraph();
     }
   }, [circuit, zxGraph]);
+
+  const formatPhase = (phase) => {
+    if (phase === 0) return '0';
+    if (phase === Math.PI) return 'π';
+    if (phase === Math.PI / 2) return 'π/2';
+    if (phase === Math.PI / 4) return 'π/4';
+    if (phase === 3 * Math.PI / 2) return '3π/2';
+    return phase.toFixed(2);
+  };
 
   const createSampleGraph = () => {
     // Create some nodes

@@ -243,9 +243,9 @@ export const CircuitProvider = ({ children }) => {
         body: JSON.stringify({
           name: circuitName,
           qubits,
-          classicalBits,
+          classical_bits: classicalBits,
           gates: circuit,
-          customGates,
+          custom_gates: customGates,
         }),
       });
 
